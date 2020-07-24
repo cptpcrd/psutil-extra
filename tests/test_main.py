@@ -17,12 +17,16 @@ if sys.platform.startswith(("linux", "freebsd")):
         finally:
             os.umask(old_mask)
 
+        assert psutil_extra.proc_get_umask(psutil.Process(os.getpid())) == mask
+
         with pytest.raises(psutil.NoSuchProcess):
             psutil_extra.proc_get_umask(-1)
 
     def test_getgroups() -> None:
         groups = psutil_extra.proc_getgroups(os.getpid())
         assert set(groups) == set(os.getgroups())
+
+        assert set(psutil_extra.proc_getgroups(psutil.Process(os.getpid()))) == set(groups)
 
         with pytest.raises(psutil.NoSuchProcess):
             psutil_extra.proc_getgroups(-1)
