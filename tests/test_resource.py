@@ -3,6 +3,7 @@ import resource
 import sys
 
 import psutil
+import pytest
 
 import psutil_extra
 
@@ -22,6 +23,9 @@ if sys.platform.startswith(("linux", "freebsd", "netbsd")):
             == limits
         )
 
+        with pytest.raises(psutil.NoSuchProcess):
+            psutil_extra.proc_rlimit(-1, resource.RLIMIT_NOFILE)
+
 
 if sys.platform.startswith(("linux", "freebsd", "netbsd", "dragonfly")):
 
@@ -33,3 +37,6 @@ if sys.platform.startswith(("linux", "freebsd", "netbsd", "dragonfly")):
         assert psutil_extra.proc_getrlimit(
             psutil.Process(os.getpid()), resource.RLIMIT_NOFILE
         ) == resource.getrlimit(resource.RLIMIT_NOFILE)
+
+        with pytest.raises(psutil.NoSuchProcess):
+            psutil_extra.proc_getrlimit(-1, resource.RLIMIT_NOFILE)
