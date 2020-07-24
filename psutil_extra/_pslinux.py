@@ -44,9 +44,11 @@ def proc_rlimit(
         raise psutil.NoSuchProcess(pid)
 
     if new_limits is None:
-        return resource.prlimit(pid, res)  # pytype: disable=missing-parameter
+        return resource.prlimit(  # pytype: disable=missing-parameter  # pylint: disable=no-member
+            pid, res
+        )
     else:
-        return resource.prlimit(pid, res, new_limits)
+        return resource.prlimit(pid, res, new_limits)  # pylint: disable=no-member
 
 
 proc_getrlimit = proc_rlimit
