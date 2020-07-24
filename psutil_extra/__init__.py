@@ -1,3 +1,5 @@
+# Type checkers don't like the wrapper names not existing.
+# mypy: ignore-errors
 # pytype: disable=module-attr
 import sys
 from typing import List, Optional, Tuple, Union, cast
@@ -22,6 +24,8 @@ elif sys.platform.startswith("dragonfly"):
     from . import _psdragonfly
 
     _psimpl = _psdragonfly
+else:
+    _psimpl = None
 
 
 def _get_pid(proc: Union[int, psutil.Process], *, check_running: bool = False) -> int:
