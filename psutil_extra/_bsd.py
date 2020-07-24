@@ -25,15 +25,22 @@ def sysctl_raw(
 
     if new is None:
         new_size = 0
+        raw_new = None
     elif isinstance(new, bytes):
         new_size = len(new)
-        new = ctypes.create_string_buffer(new)
+        raw_new = ctypes.byref(ctypes.create_string_buffer(new))
     else:
         new_size = ctypes.sizeof(new)
+        raw_new = ctypes.byref(new)
 
-    old_size = ctypes.c_size_t(0 if old is None else ctypes.sizeof(old))
+    if old is None:
+        old_size = ctypes.c_size_t(0)
+        raw_old = None
+    else:
+        old_size = ctypes.c_size_t(ctypes.sizeof(old))
+        raw_old = ctypes.byref(old)
 
-    if libc.sysctl(raw_mib, len(mib), old, ctypes.pointer(old_size), new, new_size) < 0:
+    if libc.sysctl(raw_mib, len(mib), raw_old, ctypes.byref(old_size), raw_new, new_size) < 0:
         raise _ffi.build_oserror(ctypes.get_errno())
 
     return old_size.value
