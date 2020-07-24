@@ -14,9 +14,9 @@ KERN_PROC_GROUPS = 34
 KERN_PROC_RLIMIT = 37
 KERN_PROC_UMASK = 39
 
-gid_t = ctypes.c_uint32
+gid_t = ctypes.c_uint32  # pylint: disable=invalid-name
 gid_t_format = "=I"
-rlim_t = ctypes.c_int64
+rlim_t = ctypes.c_int64  # pylint: disable=invalid-name
 
 
 class Rlimit(ctypes.Structure):

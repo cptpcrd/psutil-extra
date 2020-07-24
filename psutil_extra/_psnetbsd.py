@@ -11,7 +11,7 @@ PROC_PID_LIMIT = 2
 PROC_PID_LIMIT_TYPE_SOFT = 1
 PROC_PID_LIMIT_TYPE_HARD = 2
 
-rlim_t = ctypes.c_uint64
+rlim_t = ctypes.c_uint64  # pylint: disable=invalid-name
 
 
 def _proc_rlimit_getset(pid: int, res: int, new_limit: Optional[int], hard: bool) -> int:
