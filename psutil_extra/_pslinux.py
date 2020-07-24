@@ -1,7 +1,7 @@
 import errno
 import os
 import resource
-from typing import List, Optional, Tuple
+from typing import List, Optional, Tuple, no_type_check
 
 import psutil
 
@@ -34,6 +34,7 @@ def proc_get_umask(pid: int) -> int:
     return int(umask_str, 8)
 
 
+@no_type_check
 def proc_rlimit(
     pid: int, res: int, new_limits: Optional[Tuple[int, int]] = None
 ) -> Tuple[int, int]:
@@ -43,7 +44,7 @@ def proc_rlimit(
         raise psutil.NoSuchProcess(pid)
 
     if new_limits is None:
-        return resource.prlimit(pid, res)  # type: ignore
+        return resource.prlimit(pid, res)  # pytype: disable=missing-parameter
     else:
         return resource.prlimit(pid, res, new_limits)
 
