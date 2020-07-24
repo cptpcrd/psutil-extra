@@ -46,10 +46,30 @@ if sys.platform.startswith(("linux", "freebsd")):
 if sys.platform.startswith(("linux", "freebsd", "darwin")):
 
     def test_getgroups() -> None:
-        groups = psutil_extra.proc_getgroups(os.getpid())
-        assert set(groups) == set(os.getgroups())
+        groups = set(psutil_extra.proc_getgroups(os.getpid()))
+        groups_alt = set(psutil_extra.proc_getgroups(psutil.Process(os.getpid())))
 
-        assert set(psutil_extra.proc_getgroups(psutil.Process(os.getpid()))) == set(groups)
+        # Check for internal consistency when using PIDs vs psutil.Processes
+        assert set(groups) == set(groups_alt)
+
+        cur_groups = os.getgroups()
+        if sys.platform.startswith(("freebsd", "darwin")):
+            # These platforms may truncate the group list.
+
+            if cur_groups:
+                # We have at least one supplementary group.
+                # Make sure that the list we got isn't empty
+                assert groups
+
+                # Also make sure it doesn't contain any "extra" groups
+                assert set(groups) <= set(cur_groups)
+            else:
+                # No supplementary groups; make sure the list we
+                # got confirms that.
+                assert not groups
+        else:
+            # Linux shouldn't truncate the group list.
+            assert set(groups) == set(cur_groups)
 
     def test_getgroups_no_proc() -> None:
         with pytest.raises(psutil.NoSuchProcess):
