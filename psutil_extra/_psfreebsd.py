@@ -38,7 +38,7 @@ def proc_get_umask(pid: int) -> int:
 
     try:
         _bsd.sysctl_raw(  # pytype: disable=wrong-arg-types
-            [CTL_KERN, KERN_PROC, KERN_PROC_UMASK, pid], None, ctypes.byref(umask)  # type: ignore
+            [CTL_KERN, KERN_PROC, KERN_PROC_UMASK, pid], None, umask  # type: ignore
         )
     except OSError as ex:
         if ex.errno == errno.ENOENT:
