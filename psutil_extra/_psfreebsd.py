@@ -34,6 +34,9 @@ class Rlimit(ctypes.Structure):
 
 
 def proc_get_umask(pid: int) -> int:
+    if pid <= 0:
+        raise psutil.NoSuchProcess(pid)
+
     umask = ctypes.c_ushort()
 
     try:
@@ -50,6 +53,9 @@ def proc_get_umask(pid: int) -> int:
 
 
 def proc_getgroups(pid: int) -> List[int]:
+    if pid <= 0:
+        raise psutil.NoSuchProcess(pid)
+
     try:
         groups_bin = _bsd.sysctl([CTL_KERN, KERN_PROC, KERN_PROC_GROUPS, pid], None)
     except OSError as ex:
