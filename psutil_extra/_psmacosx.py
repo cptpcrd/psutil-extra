@@ -174,6 +174,11 @@ class KinfoProc(ctypes.Structure):
 
 
 def _get_kinfo_proc(pid: int) -> KinfoProc:
+    # sysctl() appears to return sucessfully even if the process dies.
+    # So we check first.
+    if pid <= 0 or not psutil.pid_exists(pid):
+        raise psutil.NoSuchProcess(pid)
+
     proc_info = KinfoProc()
 
     try:
