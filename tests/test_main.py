@@ -1,3 +1,4 @@
+import errno
 import os
 import sys
 
@@ -9,7 +10,14 @@ import psutil_extra
 if sys.platform.startswith(("linux", "freebsd")):
 
     def test_get_umask() -> None:
-        mask = psutil_extra.proc_get_umask(os.getpid())
+        try:
+            mask = psutil_extra.proc_get_umask(os.getpid())
+        except OSError as ex:
+            # Getting an ENOTSUP error is valid (occurs on Linux<4.7)
+            if ex.errno == errno.ENOTSUP:
+                return
+            else:
+                raise
 
         old_mask = os.umask(mask)
         try:
