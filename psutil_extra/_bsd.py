@@ -1,0 +1,53 @@
+import ctypes
+from typing import Collection, Optional, Union
+
+from . import _ffi
+
+libc = _ffi.load_libc()
+
+libc.sysctl.argtypes = (
+    ctypes.POINTER(ctypes.c_int),
+    ctypes.c_uint,
+    ctypes.c_void_p,
+    ctypes.POINTER(ctypes.c_size_t),
+    ctypes.c_void_p,
+    ctypes.c_size_t,
+)
+libc.sysctl.restype = ctypes.c_int
+
+
+def sysctl_raw(
+    mib: Collection[int],
+    new: Union[None, bytes, ctypes.Array, ctypes.Structure],  # type: ignore
+    old: Union[None, ctypes.Array, ctypes.Structure],  # type: ignore
+) -> int:
+    raw_mib = (ctypes.c_int * len(mib))(*mib)  # pytype: disable=not-callable
+
+    if new is None:
+        new_size = 0
+    elif isinstance(new, bytes):
+        new_size = len(new)
+        new = ctypes.create_string_buffer(new)
+    else:
+        new_size = ctypes.sizeof(new)
+
+    old_size = ctypes.c_size_t(0 if old is None else ctypes.sizeof(old))
+
+    if libc.sysctl(raw_mib, len(mib), old, ctypes.pointer(old_size), new, new_size) < 0:
+        raise _ffi.build_oserror(ctypes.get_errno())
+
+    return old_size.value
+
+
+def sysctl(
+    mib: Collection[int],
+    new: Union[None, bytes, ctypes.Array, ctypes.Structure],  # type: ignore
+    old_len: Optional[int] = None,
+) -> bytes:
+    if old_len is None:
+        old_len = sysctl_raw(mib, None, None)
+
+    buf = (ctypes.c_char * old_len)()
+
+    old_len = sysctl_raw(mib, new, buf)
+    return buf.raw[:old_len]

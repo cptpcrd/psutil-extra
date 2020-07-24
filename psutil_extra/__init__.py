@@ -1,0 +1,116 @@
+# pytype: disable=module-attr
+import sys
+from typing import List, Optional, Tuple, Union, cast
+
+import psutil
+
+__version__ = "0.1.0"
+
+if sys.platform.startswith("linux"):
+    from . import _pslinux
+
+    _psimpl = _pslinux
+elif sys.platform.startswith("freebsd"):
+    from . import _psfreebsd
+
+    _psimpl = _psfreebsd
+elif sys.platform.startswith("netbsd"):
+    from . import _psnetbsd
+
+    _psimpl = _psnetbsd
+elif sys.platform.startswith("dragonfly"):
+    from . import _psdragonfly
+
+    _psimpl = _psdragonfly
+
+
+def _get_pid(proc: Union[int, psutil.Process], *, check_running: bool = False) -> int:
+    if isinstance(proc, int):
+        return proc
+    else:
+        if check_running:
+            if not proc.is_running():
+                raise psutil.NoSuchProcess(proc.pid)
+
+        return cast(int, proc.pid)
+
+
+if sys.platform.startswith(("linux", "freebsd")):
+
+    def proc_get_umask(proc: Union[int, psutil.Process]) -> int:
+        """Get the umask of the given process.
+
+        Args:
+            proc: Either an integer PID or a ``psutil.Process`` specifying the process
+                to operate on.
+
+        Returns:
+            The given process's umask.
+
+        """
+
+        return _psimpl.proc_get_umask(_get_pid(proc))
+
+
+if sys.platform.startswith(("linux", "freebsd", "dragonfly")):
+
+    def proc_getgroups(proc: Union[int, psutil.Process]) -> List[int]:
+        """Get the supplementary group list for the given process.
+
+        Args:
+            proc: Either an integer PID or a ``psutil.Process`` specifying the process
+                to operate on.
+
+        Returns:
+            A list containing the given process's supplementary groups.
+
+        """
+
+        return _psimpl.proc_getgroups(_get_pid(proc))
+
+
+if sys.platform.startswith(("linux", "freebsd", "netbsd")):
+
+    def proc_rlimit(
+        proc: Union[int, psutil.Process], res: int, new_limits: Optional[Tuple[int, int]] = None
+    ) -> Tuple[int, int]:
+        """Identical to ``Process.rlimit()``, but is implemented for some platforms
+        other than Linux.
+
+        Args:
+            proc: Either an integer PID or a ``psutil.Process`` specifying the process
+                to operate on. If a ``psutil.Process`` is given and ``new_limits`` is
+                passed, this function preemptively checks ``Process.is_running()``.
+            res: The resource (one of the ``resource.RLIMIT_*`` constants) to get/set.
+            new_limits: If given and not ``None``, the new ``(soft, hard)`` resource
+                limits to set.
+
+        Returns:
+            A tuple of the given process's ``(soft, hard)`` limits for the given
+            resource (prior to setting the new limits).
+
+        """
+
+        return _psimpl.proc_rlimit(
+            _get_pid(proc, check_running=(new_limits is not None)), res, new_limits
+        )
+
+
+if sys.platform.startswith(("linux", "freebsd", "netbsd", "dragonfly")):
+
+    def proc_getrlimit(proc: Union[int, psutil.Process], res: int) -> Tuple[int, int]:
+        """A version of ``proc_rlimit()`` that only supports *getting* resource limits
+        (but is implemented on more platforms).
+
+        Args:
+            proc: Either an integer PID or a ``psutil.Process`` specifying the process
+                to operate on.
+            res: The resource (one of the ``resource.RLIMIT_*`` constants) to get/set.
+
+        Returns:
+            A tuple of the given process's ``(soft, hard)`` limits for the given
+            resource.
+
+        """
+
+        return _psimpl.proc_getrlimit(_get_pid(proc), res)
