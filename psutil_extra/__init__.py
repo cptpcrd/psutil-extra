@@ -53,7 +53,14 @@ if sys.platform.startswith(("linux", "freebsd")):
 
         """
 
-        return _psimpl.proc_get_umask(_get_pid(proc))
+        pid = _get_pid(proc)
+
+        try:
+            return _psimpl.proc_get_umask(pid)
+        except ProcessLookupError:
+            raise psutil.NoSuchProcess(pid)
+        except PermissionError:
+            raise psutil.AccessDenied(pid)
 
 
 if sys.platform.startswith(("linux", "freebsd", "dragonfly")):
@@ -70,7 +77,14 @@ if sys.platform.startswith(("linux", "freebsd", "dragonfly")):
 
         """
 
-        return _psimpl.proc_getgroups(_get_pid(proc))
+        pid = _get_pid(proc)
+
+        try:
+            return _psimpl.proc_getgroups(pid)
+        except ProcessLookupError:
+            raise psutil.NoSuchProcess(pid)
+        except PermissionError:
+            raise psutil.AccessDenied(pid)
 
 
 if sys.platform.startswith(("linux", "freebsd", "netbsd")):
@@ -95,9 +109,14 @@ if sys.platform.startswith(("linux", "freebsd", "netbsd")):
 
         """
 
-        return _psimpl.proc_rlimit(
-            _get_pid(proc, check_running=(new_limits is not None)), res, new_limits
-        )
+        pid = _get_pid(proc, check_running=(new_limits is not None))
+
+        try:
+            return _psimpl.proc_rlimit(pid, res, new_limits)
+        except ProcessLookupError:
+            raise psutil.NoSuchProcess(pid)
+        except PermissionError:
+            raise psutil.AccessDenied(pid)
 
 
 if sys.platform.startswith(("linux", "freebsd", "netbsd", "dragonfly")):
@@ -117,4 +136,11 @@ if sys.platform.startswith(("linux", "freebsd", "netbsd", "dragonfly")):
 
         """
 
-        return _psimpl.proc_getrlimit(_get_pid(proc), res)
+        pid = _get_pid(proc)
+
+        try:
+            return _psimpl.proc_getrlimit(pid, res)
+        except ProcessLookupError:
+            raise psutil.NoSuchProcess(pid)
+        except PermissionError:
+            raise psutil.AccessDenied(pid)
