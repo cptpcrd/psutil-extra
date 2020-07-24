@@ -41,7 +41,7 @@ task:
       else
         pkg install -y curl
         curl https://bootstrap.pypa.io/get-pip.py -o /tmp/get-pip.py
-        $PYTHON_EXE /tmp/get-pip.py install
+        (cd /tmp && $PYTHON_EXE get-pip.py install)
         $PIP_EXE install -U pip
       fi
     - $PIP_EXE install pipenv
