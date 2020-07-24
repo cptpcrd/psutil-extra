@@ -36,13 +36,17 @@ if sys.platform.startswith(("linux", "freebsd", "netbsd")):
             psutil_extra.proc_rlimit(proc.pid, resource.RLIMIT_NOFILE)
 
         with pytest.raises(psutil.NoSuchProcess):
-            psutil_extra.proc_rlimit(proc.pid, resource.RLIMIT_NOFILE, resource.getrlimit(resource.RLIMIT_NOFILE))
+            psutil_extra.proc_rlimit(
+                proc.pid, resource.RLIMIT_NOFILE, resource.getrlimit(resource.RLIMIT_NOFILE)
+            )
 
         with pytest.raises(psutil.NoSuchProcess):
             psutil_extra.proc_rlimit(proc, resource.RLIMIT_NOFILE)
 
         with pytest.raises(psutil.NoSuchProcess):
-            psutil_extra.proc_rlimit(proc, resource.RLIMIT_NOFILE, resource.getrlimit(resource.RLIMIT_NOFILE))
+            psutil_extra.proc_rlimit(
+                proc, resource.RLIMIT_NOFILE, resource.getrlimit(resource.RLIMIT_NOFILE)
+            )
 
 
 if sys.platform.startswith(("linux", "freebsd", "netbsd", "dragonfly")):
