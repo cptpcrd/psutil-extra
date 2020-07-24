@@ -1,7 +1,13 @@
+# pylint: disable=invalid-name
 import ctypes
 import ctypes.util
 import os
 from typing import Union
+
+pid_t = ctypes.c_int
+uid_t = ctypes.c_uint32
+gid_t = ctypes.c_uint32
+
 
 _libc = None
 

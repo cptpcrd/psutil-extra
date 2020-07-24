@@ -42,6 +42,9 @@ if sys.platform.startswith(("linux", "freebsd")):
         with pytest.raises(psutil.NoSuchProcess):
             psutil_extra.proc_get_umask(proc)
 
+
+if sys.platform.startswith(("linux", "freebsd", "darwin")):
+
     def test_getgroups() -> None:
         groups = psutil_extra.proc_getgroups(os.getpid())
         assert set(groups) == set(os.getgroups())
