@@ -30,23 +30,17 @@ def _proc_rlimit_getset(pid: int, res: int, new_limit: Optional[int], hard: bool
     new_limit_raw = ctypes.byref(rlim_t(new_limit)) if new_limit is not None else None
     old_limit = rlim_t(0)
 
-    try:
-        _bsd.sysctl_raw(  # pytype: disable=wrong-arg-types
-            [
-                CTL_PROC,
-                pid,
-                PROC_PID_LIMIT,
-                res + 1,
-                (PROC_PID_LIMIT_TYPE_HARD if hard else PROC_PID_LIMIT_TYPE_SOFT),
-            ],
-            new_limit_raw,  # type: ignore
-            ctypes.byref(old_limit),  # type: ignore
-        )
-    except OSError as ex:
-        if ex.errno == errno.ENOENT:
-            raise psutil.NoSuchProcess(pid)
-        else:
-            raise
+    _bsd.sysctl_raw(  # pytype: disable=wrong-arg-types
+        [
+            CTL_PROC,
+            pid,
+            PROC_PID_LIMIT,
+            res + 1,
+            (PROC_PID_LIMIT_TYPE_HARD if hard else PROC_PID_LIMIT_TYPE_SOFT),
+        ],
+        new_limit_raw,  # type: ignore
+        old_limit,  # type: ignore
+    )
 
     return old_limit.value
 
@@ -204,15 +198,9 @@ def _get_kinfo_proc2(pid: int) -> KinfoProc2:
 
     proc_info = KinfoProc2()
 
-    try:
-        _bsd.sysctl_raw([CTL_KERN, KERN_PROC, KERN_PROC_PID, pid], None, proc_info)
-    except OSError as ex:
-        if ex.errno == errno.ENOENT:
-            raise psutil.NoSuchProcess(pid)
-        else:
-            raise
-    else:
-        return proc_info
+    _bsd.sysctl_raw([CTL_KERN, KERN_PROC, KERN_PROC_PID, pid], None, proc_info)
+
+    return proc_info
 
 
 def proc_getgroups(pid: int) -> List[int]:
