@@ -103,6 +103,10 @@ if sys.platform.startswith(("linux", "freebsd", "netbsd")):
         """Identical to ``Process.rlimit()``, but is implemented for some platforms
         other than Linux.
 
+        WARNING: This function may not be able to set the soft and hard resource limits
+        in one operation. If it returns with an error, one or both of the limits may have
+        been changed.
+
         Args:
             proc: Either an integer PID or a ``psutil.Process`` specifying the process
                 to operate on. If a ``psutil.Process`` is given and ``new_limits`` is
