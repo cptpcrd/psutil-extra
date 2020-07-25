@@ -6,9 +6,7 @@ import os
 import resource
 from typing import List, Tuple
 
-import psutil
-
-from . import _psposix
+from . import _psposix, _util
 
 RESOURCE_NAMES = {
     resource.RLIMIT_CPU: "cpu",
@@ -28,7 +26,7 @@ RESOURCE_NAMES = {
 
 def proc_getgroups(pid: int) -> List[int]:
     try:
-        with open(os.path.join(psutil.PROCFS_PATH, str(pid), "status")) as file:
+        with open(os.path.join(_util.get_procfs_path(), str(pid), "status")) as file:
             return list(map(int, file.read().split(" ")[13].split(",")[1:]))
     except FileNotFoundError:
         raise ProcessLookupError
@@ -41,7 +39,7 @@ def proc_get_rlimit(pid: int, res: int) -> Tuple[int, int]:
         raise ValueError("invalid resource specified")
 
     try:
-        with open(os.path.join(psutil.PROCFS_PATH, str(pid), "rlimit")) as file:
+        with open(os.path.join(_util.get_procfs_path(), str(pid), "rlimit")) as file:
             for line in file:
                 name, lim_cur_str, lim_max_str = line.split()
 

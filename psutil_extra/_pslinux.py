@@ -3,12 +3,12 @@ import os
 import resource
 from typing import List, Optional, Tuple, no_type_check
 
-from . import _ffi, _psposix
+from . import _ffi, _psposix, _util
 
 
 def _get_proc_status(pid: int, name: str) -> str:
     try:
-        with open(os.path.join(psutil.PROCFS_PATH, str(pid), "status")) as file:
+        with open(os.path.join(_util.get_procfs_path(), str(pid), "status")) as file:
             for line in file:
                 if line.startswith(name + ":\t"):
                     return line[len(name) + 2:].rstrip("\n")
