@@ -1,5 +1,4 @@
 import ctypes
-import errno
 import resource
 import struct
 from typing import List, Optional, Tuple
@@ -50,14 +49,9 @@ def proc_getgroups(pid: int) -> List[int]:
     if pid <= 0:
         raise psutil.NoSuchProcess(pid)
 
-    while True:
-        try:
-            groups_bin = _bsd.sysctl([CTL_KERN, KERN_PROC, KERN_PROC_GROUPS, pid], None)
-        except OSError as ex:
-            if ex.errno != errno.EINVAL:
-                raise
-        else:
-            return [gid for (gid,) in struct.iter_unpack(gid_t_format, groups_bin)]
+    groups_bin = _bsd.sysctl([CTL_KERN, KERN_PROC, KERN_PROC_GROUPS, pid], None)
+
+    return [gid for (gid,) in struct.iter_unpack(gid_t_format, groups_bin)]
 
 
 def proc_rlimit(
