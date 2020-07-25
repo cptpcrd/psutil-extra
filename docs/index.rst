@@ -46,7 +46,7 @@ instance or an ``int`` representing a process ID.
        A list of the given process's current supplementary groups.
    :rtype: list[int]
 
-   Availability: Linux, FreeBSD, DragonflyBSD, macOS, NetBSD, Solaris
+   Availability: Linux, FreeBSD, DragonflyBSD, macOS, NetBSD, Solaris, OpenBSD
 
 
 .. py:function:: proc_rlimit(proc, resource, new_limits=None)

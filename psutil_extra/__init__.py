@@ -21,6 +21,10 @@ elif sys.platform.startswith("netbsd"):
     from . import _psnetbsd
 
     _psimpl = _psnetbsd
+elif sys.platform.startswith("openbsd"):
+    from . import _psopenbsd
+
+    _psimpl = _psopenbsd
 elif sys.platform.startswith("dragonfly"):
     from . import _psdragonfly
 
@@ -72,7 +76,9 @@ if sys.platform.startswith(("linux", "freebsd")):
             raise psutil.AccessDenied(pid)
 
 
-if sys.platform.startswith(("linux", "freebsd", "dragonfly", "darwin", "netbsd", "solaris")):
+if sys.platform.startswith(
+    ("linux", "freebsd", "dragonfly", "darwin", "netbsd", "openbsd", "solaris")
+):
 
     def proc_getgroups(proc: Union[int, psutil.Process]) -> List[int]:
         """Get the supplementary group list for the given process.
