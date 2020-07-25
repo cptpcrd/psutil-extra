@@ -49,7 +49,7 @@ if sys.platform.startswith(("linux", "freebsd", "netbsd")):
             )
 
     def test_proc_rlimit_error() -> None:
-        with pytest.raises(psutil.NoSuchProcess):
+        with pytest.raises(ValueError, match=r"^current limit exceeds maximum limit$"):
             psutil_extra.proc_rlimit(os.getpid(), resource.RLIMIT_NOFILE, (1, 0))
 
 
