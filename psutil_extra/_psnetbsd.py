@@ -14,7 +14,7 @@ PROC_PID_LIMIT = 2
 PROC_PID_LIMIT_TYPE_SOFT = 1
 PROC_PID_LIMIT_TYPE_HARD = 2
 
-KERN_PROC = 14
+KERN_PROC2 = 47
 KERN_PROC_PID = 1
 
 KI_NGROUPS = 16
@@ -198,7 +198,7 @@ def _get_kinfo_proc2(pid: int) -> KinfoProc2:
 
     proc_info = KinfoProc2()
 
-    _bsd.sysctl_raw([CTL_KERN, KERN_PROC, KERN_PROC_PID, pid], None, proc_info)
+    _bsd.sysctl_raw([CTL_KERN, KERN_PROC2, KERN_PROC_PID, pid], None, proc_info)
 
     return proc_info
 
