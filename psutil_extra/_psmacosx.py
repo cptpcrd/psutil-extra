@@ -1,6 +1,5 @@
 # pylint: disable=invalid-name,too-few-public-methods
 import ctypes
-import errno
 from typing import List
 
 import psutil
@@ -174,22 +173,17 @@ class KinfoProc(ctypes.Structure):
 
 
 def _get_kinfo_proc(pid: int) -> KinfoProc:
-    # sysctl() appears to return sucessfully even if the process dies.
-    # So we check first.
-    if pid <= 0 or not psutil.pid_exists(pid):
+    if pid <= 0:
         raise psutil.NoSuchProcess(pid)
 
     proc_info = KinfoProc()
 
-    try:
-        sysctl_raw([CTL_KERN, KERN_PROC, KERN_PROC_PID, pid], None, proc_info)
-    except OSError as ex:
-        if ex.errno == errno.ENOENT:
-            raise psutil.NoSuchProcess(pid)
-        else:
-            raise
-    else:
-        return proc_info
+    length = sysctl_raw([CTL_KERN, KERN_PROC, KERN_PROC_PID, pid], None, proc_info)
+
+    if length == 0:
+        raise psutil.NoSuchProcess(pid)
+
+    return proc_info
 
 
 def proc_getgroups(pid: int) -> List[int]:

@@ -191,14 +191,15 @@ class KinfoProc2(ctypes.Structure):
 
 
 def _get_kinfo_proc2(pid: int) -> KinfoProc2:
-    # sysctl() appears to return sucessfully even if the process dies.
-    # So we check first.
-    if pid <= 0 or not psutil.pid_exists(pid):
+    if pid <= 0:
         raise psutil.NoSuchProcess(pid)
 
     proc_info = KinfoProc2()
 
-    _bsd.sysctl_raw([CTL_KERN, KERN_PROC2, KERN_PROC_PID, pid], None, proc_info)
+    length = _bsd.sysctl_raw([CTL_KERN, KERN_PROC2, KERN_PROC_PID, pid], None, proc_info)
+
+    if length == 0:
+        raise psutil.NoSuchProcess(pid)
 
     return proc_info
 
