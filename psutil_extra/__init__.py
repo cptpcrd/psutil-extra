@@ -28,6 +28,10 @@ elif sys.platform.startswith("darwin"):
     from . import _psmacosx
 
     _psimpl = _psmacosx
+elif sys.platform.startswith("solaris"):
+    from . import _pssolaris
+
+    _psimpl = _pssolaris
 else:
     _psimpl = None
 
@@ -67,7 +71,7 @@ if sys.platform.startswith(("linux", "freebsd")):
             raise psutil.AccessDenied(pid)
 
 
-if sys.platform.startswith(("linux", "freebsd", "dragonfly", "darwin", "netbsd")):
+if sys.platform.startswith(("linux", "freebsd", "dragonfly", "darwin", "netbsd", "solaris")):
 
     def proc_getgroups(proc: Union[int, psutil.Process]) -> List[int]:
         """Get the supplementary group list for the given process.
