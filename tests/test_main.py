@@ -53,7 +53,7 @@ if sys.platform.startswith(("linux", "freebsd", "dragonfly", "darwin", "netbsd",
         assert set(groups) == set(groups_alt)
 
         cur_groups = os.getgroups()
-        if sys.platform.startswith(("freebsd", "darwin")):
+        if sys.platform.startswith(("freebsd", "darwin", "netbsd")):
             # These platforms may truncate the group list.
 
             if cur_groups:
