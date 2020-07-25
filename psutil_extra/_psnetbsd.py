@@ -5,7 +5,7 @@ from typing import List, Optional, Tuple
 
 import psutil
 
-from . import _bsd, _ffi
+from . import _bsd
 
 CTL_KERN = 1
 CTL_PROC = 10
