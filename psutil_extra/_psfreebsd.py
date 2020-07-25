@@ -39,15 +39,9 @@ def proc_get_umask(pid: int) -> int:
 
     umask = ctypes.c_ushort()
 
-    try:
-        _bsd.sysctl_raw(  # pytype: disable=wrong-arg-types
-            [CTL_KERN, KERN_PROC, KERN_PROC_UMASK, pid], None, umask  # type: ignore
-        )
-    except OSError as ex:
-        if ex.errno == errno.ENOENT:
-            raise psutil.NoSuchProcess(pid)
-        else:
-            raise
+    _bsd.sysctl_raw(  # pytype: disable=wrong-arg-types
+        [CTL_KERN, KERN_PROC, KERN_PROC_UMASK, pid], None, umask  # type: ignore
+    )
 
     return umask.value
 
@@ -56,13 +50,7 @@ def proc_getgroups(pid: int) -> List[int]:
     if pid <= 0:
         raise psutil.NoSuchProcess(pid)
 
-    try:
-        groups_bin = _bsd.sysctl([CTL_KERN, KERN_PROC, KERN_PROC_GROUPS, pid], None)
-    except OSError as ex:
-        if ex.errno == errno.ENOENT:
-            raise psutil.NoSuchProcess(pid)
-        else:
-            raise
+    groups_bin = _bsd.sysctl([CTL_KERN, KERN_PROC, KERN_PROC_GROUPS, pid], None)
 
     return [gid for (gid,) in struct.iter_unpack(gid_t_format, groups_bin)]
 
@@ -77,15 +65,7 @@ def proc_rlimit(
 
     old_limits = Rlimit(rlim_cur=resource.RLIM_INFINITY, rlim_max=resource.RLIM_INFINITY)
 
-    try:
-        _bsd.sysctl_raw(
-            [CTL_KERN, KERN_PROC, KERN_PROC_RLIMIT, pid, res], new_limits_raw, old_limits
-        )
-    except OSError as ex:
-        if ex.errno == errno.ENOENT:
-            raise psutil.NoSuchProcess(pid)
-        else:
-            raise
+    _bsd.sysctl_raw([CTL_KERN, KERN_PROC, KERN_PROC_RLIMIT, pid, res], new_limits_raw, old_limits)
 
     return old_limits.unpack()
 
