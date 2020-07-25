@@ -124,3 +124,33 @@ jobs:
 
       - name: Build docs
         run: make -C docs html
+
+  publish:
+    name: Publish
+
+    needs:
+      - format_lint
+      - test
+      - build
+
+    runs-on: ubuntu-latest
+
+    # Only run for new releases
+    if: github.event_name == 'release'
+
+    steps:
+      - name: Set up repo
+        uses: actions/checkout@v2
+      - name: Set up Python
+        uses: actions/setup-python@v2
+      - name: Install wheel
+        run: pip install wheel
+
+      - name: Build package
+        run: python setup.py sdist bdist_wheel
+
+      - name: Publish to PyPI
+        uses: pypa/gh-action-pypi-publish@v1.3.1
+        with:
+          user: __token__
+          password: ${{ secrets.PYPI_TOKEN }}
