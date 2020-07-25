@@ -6,6 +6,7 @@ import psutil
 import pytest
 
 import psutil_extra
+from psutil_extra._util import _resource_nums as resource_nums
 
 from .util import fork_proc
 
@@ -52,6 +53,9 @@ if sys.platform.startswith(("linux", "freebsd", "netbsd")):
         with pytest.raises(ValueError, match=r"^current limit exceeds maximum limit$"):
             psutil_extra.proc_rlimit(os.getpid(), resource.RLIMIT_NOFILE, (1, 0))
 
+        with pytest.raises(ValueError, match=r"^invalid resource specified$"):
+            psutil_extra.proc_rlimit(os.getpid(), max(resource_nums) + 1)
+
 
 if sys.platform.startswith(("linux", "freebsd", "netbsd", "dragonfly")):
 
@@ -76,3 +80,7 @@ if sys.platform.startswith(("linux", "freebsd", "netbsd", "dragonfly")):
 
         with pytest.raises(psutil.NoSuchProcess):
             psutil_extra.proc_getrlimit(proc, resource.RLIMIT_NOFILE)
+
+    def test_proc_getrlimit_error() -> None:
+        with pytest.raises(ValueError, match=r"^invalid resource specified$"):
+            psutil_extra.proc_getrlimit(os.getpid(), max(resource_nums) + 1)
