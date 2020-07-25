@@ -5,7 +5,7 @@ from typing import Iterator, List
 
 import psutil
 
-from . import _ffi
+from . import _ffi, _psposix
 
 libc = _ffi.load_libc()
 
@@ -45,3 +45,6 @@ def proc_getgroups(pid: int) -> List[int]:
             raise _ffi.build_oserror(errno.EINVAL)
 
         return [groups_ptr[i].value for i in range(ngroups)]
+
+
+proc_getpgid = _psposix.proc_getpgid

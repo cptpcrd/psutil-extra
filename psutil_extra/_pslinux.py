@@ -5,7 +5,7 @@ from typing import List, Optional, Tuple, no_type_check
 
 import psutil
 
-from . import _ffi
+from . import _ffi, _psposix
 
 
 def _get_proc_status(pid: int, name: str) -> str:
@@ -52,3 +52,5 @@ def proc_rlimit(
 
 
 proc_getrlimit = proc_rlimit
+
+proc_getpgid = _psposix.proc_getpgid

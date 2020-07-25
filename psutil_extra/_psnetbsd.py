@@ -5,7 +5,7 @@ from typing import List, Optional, Tuple
 
 import psutil
 
-from . import _bsd, _util
+from . import _bsd, _psposix, _util
 
 CTL_KERN = 1
 CTL_PROC = 10
@@ -206,3 +206,6 @@ def _get_kinfo_proc2(pid: int) -> KinfoProc2:
 
 def proc_getgroups(pid: int) -> List[int]:
     return _get_kinfo_proc2(pid).get_groups()
+
+
+proc_getpgid = _psposix.proc_getpgid

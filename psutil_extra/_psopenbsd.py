@@ -1,10 +1,10 @@
 # pylint: disable=too-few-public-methods
 import ctypes
-from typing import List
+from typing import List, cast
 
 import psutil
 
-from . import _bsd
+from . import _bsd, _psposix
 
 CTL_KERN = 1
 
@@ -138,3 +138,10 @@ def _get_kinfo_proc(pid: int) -> KinfoProc:
 
 def proc_getgroups(pid: int) -> List[int]:
     return _get_kinfo_proc(pid).get_groups()
+
+
+def proc_getpgid(pid: int) -> int:
+    try:
+        return _psposix.proc_getpgid(pid)
+    except PermissionError:
+        return cast(int, _get_kinfo_proc(pid).p__pgid)

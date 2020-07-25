@@ -8,6 +8,8 @@ from typing import List, Tuple
 
 import psutil
 
+from . import _psposix
+
 RESOURCE_NAMES = {
     resource.RLIMIT_CPU: "cpu",
     resource.RLIMIT_FSIZE: "fsize",
@@ -57,3 +59,6 @@ def proc_get_rlimit(pid: int, res: int) -> Tuple[int, int]:
         raise ValueError("invalid resource specified")
     except FileNotFoundError:
         raise psutil.NoSuchProcess(pid)
+
+
+proc_getpgid = _psposix.proc_getpgid

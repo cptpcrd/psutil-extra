@@ -176,3 +176,33 @@ if sys.platform.startswith(("linux", "freebsd", "netbsd", "dragonfly")):
             raise psutil.NoSuchProcess(pid)
         except PermissionError:
             raise psutil.AccessDenied(pid)
+
+
+if sys.platform.startswith(
+    ("linux", "freebsd", "netbsd", "openbsd", "dragonfly", "darwin", "solaris")
+):
+
+    def proc_getpgid(proc: Union[int, psutil.Process]) -> int:
+        """Get the process group ID of the given process.
+
+
+        On platforms where ``os.getpgid()`` returns EPERM for processes in other sessions,
+        this function may still be able to get the process group ID for these processes.
+
+        Args:
+            proc: Either an integer PID or a ``psutil.Process`` specifying the process
+                to operate on.
+
+        Returns:
+            The process group ID of the given process.
+
+        """
+
+        pid = _get_pid(proc)
+
+        try:
+            return _psimpl.proc_getpgid(pid)
+        except ProcessLookupError:
+            raise psutil.NoSuchProcess(pid)
+        except PermissionError:
+            raise psutil.AccessDenied(pid)

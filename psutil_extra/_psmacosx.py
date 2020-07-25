@@ -4,6 +4,7 @@ from typing import List
 
 import psutil
 
+from . import _psposix
 from ._bsd import sysctl_raw
 from ._ffi import gid_t, load_libc, pid_t, uid_t
 
@@ -188,3 +189,6 @@ def _get_kinfo_proc(pid: int) -> KinfoProc:
 
 def proc_getgroups(pid: int) -> List[int]:
     return _get_kinfo_proc(pid).get_groups()
+
+
+proc_getpgid = _psposix.proc_getpgid

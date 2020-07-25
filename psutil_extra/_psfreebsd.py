@@ -6,7 +6,7 @@ from typing import List, Optional, Tuple
 
 import psutil
 
-from . import _bsd, _util
+from . import _bsd, _psposix, _util
 
 CTL_KERN = 1
 KERN_PROC = 14
@@ -78,3 +78,5 @@ def proc_rlimit(
 
 
 proc_getrlimit = proc_rlimit
+
+proc_getpgid = _psposix.proc_getpgid
