@@ -3,8 +3,6 @@ import os
 import resource
 from typing import List, Optional, Tuple, no_type_check
 
-import psutil
-
 from . import _ffi, _psposix
 
 
@@ -16,7 +14,7 @@ def _get_proc_status(pid: int, name: str) -> str:
                     return line[len(name) + 2:].rstrip("\n")
 
     except FileNotFoundError:
-        raise psutil.NoSuchProcess(pid)
+        raise ProcessLookupError
 
     raise ValueError
 
@@ -41,7 +39,7 @@ def proc_rlimit(
     if pid == 0:
         # prlimit() treats pid=0 specially.
         # psutil doesn't, so we don't either.
-        raise psutil.NoSuchProcess(pid)
+        raise ProcessLookupError
 
     if new_limits is None:
         return resource.prlimit(  # pytype: disable=missing-parameter  # pylint: disable=no-member

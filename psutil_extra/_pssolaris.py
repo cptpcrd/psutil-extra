@@ -3,8 +3,6 @@ import ctypes
 import errno
 from typing import Iterator, List
 
-import psutil
-
 from . import _ffi, _psposix
 
 libc = _ffi.load_libc()
@@ -36,7 +34,7 @@ def _get_ucred(pid: int) -> Iterator[ctypes.c_void_p]:
 
 def proc_getgroups(pid: int) -> List[int]:
     if pid <= 0:
-        raise psutil.NoSuchProcess(pid)
+        raise ProcessLookupError
 
     with _get_ucred(pid) as raw_ucred:
         groups_ptr = ctypes.POINTER(_ffi.gid_t)()  # pytype: disable=not-callable

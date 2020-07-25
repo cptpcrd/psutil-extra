@@ -4,8 +4,6 @@ import resource
 import struct
 from typing import List, Optional, Tuple
 
-import psutil
-
 from . import _bsd, _psposix, _util
 
 CTL_KERN = 1
@@ -35,7 +33,7 @@ class Rlimit(ctypes.Structure):
 
 def proc_get_umask(pid: int) -> int:
     if pid <= 0:
-        raise psutil.NoSuchProcess(pid)
+        raise ProcessLookupError
 
     umask = ctypes.c_ushort()
 
@@ -48,7 +46,7 @@ def proc_get_umask(pid: int) -> int:
 
 def proc_getgroups(pid: int) -> List[int]:
     if pid <= 0:
-        raise psutil.NoSuchProcess(pid)
+        raise ProcessLookupError
 
     while True:
         try:
@@ -64,7 +62,7 @@ def proc_rlimit(
     pid: int, res: int, new_limits: Optional[Tuple[int, int]] = None
 ) -> Tuple[int, int]:
     if pid <= 0:
-        raise psutil.NoSuchProcess(pid)
+        raise ProcessLookupError
 
     _util.check_rlimit_resource(res)
 

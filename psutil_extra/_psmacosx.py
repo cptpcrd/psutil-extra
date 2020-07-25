@@ -2,8 +2,6 @@
 import ctypes
 from typing import List
 
-import psutil
-
 from . import _psposix
 from ._bsd import sysctl_raw
 from ._ffi import gid_t, load_libc, pid_t, uid_t
@@ -175,14 +173,14 @@ class KinfoProc(ctypes.Structure):
 
 def _get_kinfo_proc(pid: int) -> KinfoProc:
     if pid <= 0:
-        raise psutil.NoSuchProcess(pid)
+        raise ProcessLookupError
 
     proc_info = KinfoProc()
 
     length = sysctl_raw([CTL_KERN, KERN_PROC, KERN_PROC_PID, pid], None, proc_info)
 
     if length == 0:
-        raise psutil.NoSuchProcess(pid)
+        raise ProcessLookupError
 
     return proc_info
 

@@ -3,8 +3,6 @@ import ctypes
 import errno
 from typing import List, Optional, Tuple
 
-import psutil
-
 from . import _bsd, _psposix, _util
 
 CTL_KERN = 1
@@ -49,7 +47,7 @@ def proc_rlimit(
     pid: int, res: int, new_limits: Optional[Tuple[int, int]] = None
 ) -> Tuple[int, int]:
     if pid <= 0:
-        raise psutil.NoSuchProcess(pid)
+        raise ProcessLookupError
 
     _util.check_rlimit_resource(res)
 
@@ -192,14 +190,14 @@ class KinfoProc2(ctypes.Structure):
 
 def _get_kinfo_proc2(pid: int) -> KinfoProc2:
     if pid <= 0:
-        raise psutil.NoSuchProcess(pid)
+        raise ProcessLookupError
 
     proc_info = KinfoProc2()
 
     length = _bsd.sysctl_raw([CTL_KERN, KERN_PROC2, KERN_PROC_PID, pid], None, proc_info)
 
     if length == 0:
-        raise psutil.NoSuchProcess(pid)
+        raise ProcessLookupError
 
     return proc_info
 

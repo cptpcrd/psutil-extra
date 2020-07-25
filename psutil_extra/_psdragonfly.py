@@ -31,7 +31,7 @@ def proc_getgroups(pid: int) -> List[int]:
         with open(os.path.join(psutil.PROCFS_PATH, str(pid), "status")) as file:
             return list(map(int, file.read().split(" ")[13].split(",")[1:]))
     except FileNotFoundError:
-        raise psutil.NoSuchProcess(pid)
+        raise ProcessLookupError
 
 
 def proc_get_rlimit(pid: int, res: int) -> Tuple[int, int]:
@@ -58,7 +58,7 @@ def proc_get_rlimit(pid: int, res: int) -> Tuple[int, int]:
 
         raise ValueError("invalid resource specified")
     except FileNotFoundError:
-        raise psutil.NoSuchProcess(pid)
+        raise ProcessLookupError
 
 
 proc_getpgid = _psposix.proc_getpgid
