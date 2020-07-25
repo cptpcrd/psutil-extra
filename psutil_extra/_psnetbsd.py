@@ -5,7 +5,7 @@ from typing import List, Optional, Tuple
 
 import psutil
 
-from . import _bsd
+from . import _bsd, _util
 
 CTL_KERN = 1
 CTL_PROC = 10
@@ -50,6 +50,8 @@ def proc_rlimit(
 ) -> Tuple[int, int]:
     if pid <= 0:
         raise psutil.NoSuchProcess(pid)
+
+    _util.check_rlimit_resource(res)
 
     new_soft: Optional[int]
     new_hard: Optional[int]
