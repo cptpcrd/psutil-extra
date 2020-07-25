@@ -48,6 +48,10 @@ if sys.platform.startswith(("linux", "freebsd", "netbsd")):
                 proc, resource.RLIMIT_NOFILE, resource.getrlimit(resource.RLIMIT_NOFILE)
             )
 
+    def test_proc_rlimit_error() -> None:
+        with pytest.raises(psutil.NoSuchProcess):
+            psutil_extra.proc_rlimit(os.getpid(), resource.RLIMIT_NOFILE, (1, 0))
+
 
 if sys.platform.startswith(("linux", "freebsd", "netbsd", "dragonfly")):
 

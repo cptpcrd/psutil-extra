@@ -56,8 +56,6 @@ def proc_rlimit(
     if new_limits is not None:
         new_soft = new_limits[0]
         new_hard = new_limits[1]
-        if new_soft > new_hard:
-            raise _ffi.build_oserror(errno.EINVAL)
     else:
         new_soft = None
         new_hard = None

@@ -123,6 +123,19 @@ if sys.platform.startswith(("linux", "freebsd", "netbsd")):
 
         pid = _get_pid(proc, check_running=(new_limits is not None))
 
+        if new_limits is not None:
+            soft, hard = new_limits
+
+            if soft > hard:
+                raise ValueError("current limit exceeds maximum limit")
+
+            if soft < 0:
+                soft = resource.RLIM_INFINITY
+            if hard < 0:
+                hard = resource.RLIM_INFINITY
+
+            new_limits = (soft, hard)
+
         try:
             return _psimpl.proc_rlimit(pid, res, new_limits)
         except ProcessLookupError:
