@@ -1,6 +1,7 @@
 # Type checkers don't like the wrapper names not existing.
 # mypy: ignore-errors
 # pytype: disable=module-attr
+import resource
 import sys
 from typing import List, Optional, Tuple, Union, cast
 
