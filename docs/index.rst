@@ -12,6 +12,31 @@ Process information
 All of these functions take a ``proc`` argument; this can either be a ``psutil.Process``
 instance or an ``int`` representing a process ID.
 
+.. py:function:: oneshot_proc(pid)
+
+   Similar to ``psutil.Process.oneshot()``, enables caching of values that can be
+   retrieved by the same method for the given PID.
+
+   .. warning::
+        This function differs from ``psutil.Process.oneshot()`` in two important ways:
+
+        * The process information cache is thread-local. This avoids concurrent modification issues.
+        * The caching is done by PID, not by ``psutil.Process`` instance, and as a result the cache
+          will be used regardless of whether a ``psutil.Process`` or an integer PID is passed to the
+          underlying function. For example:
+
+          .. code-block::
+
+               with oneshot_proc(1):
+                   proc_getgroups(1)  # Retrieves the process information
+                   proc_getgroups(1)  # Uses the cached information
+                   proc_getgroups(psutil.Process(1))  # Also uses the cached information
+
+
+   :param int pid:
+        The PID of the process for which caching should be enabled.
+
+
 .. py:function:: proc_get_umask(proc)
 
    Returns the umask of the given process without changing it.

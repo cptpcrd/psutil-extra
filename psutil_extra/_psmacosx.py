@@ -1,8 +1,8 @@
 # pylint: disable=invalid-name,too-few-public-methods
 import ctypes
-from typing import List
+from typing import List, cast
 
-from . import _psposix
+from . import _cache, _psposix
 from ._bsd import sysctl_raw
 from ._ffi import gid_t, load_libc, pid_t, uid_t
 
@@ -171,6 +171,7 @@ class KinfoProc(ctypes.Structure):
         return list(self.kp_eproc.e_ucred.cr_groups[: self.kp_eproc.e_ucred.cr_ngroups])
 
 
+@_cache.CachedByPid
 def _get_kinfo_proc(pid: int) -> KinfoProc:
     if pid <= 0:
         raise ProcessLookupError
@@ -189,5 +190,14 @@ def proc_getgroups(pid: int) -> List[int]:
     return _get_kinfo_proc(pid).get_groups()
 
 
-proc_getpgid = _psposix.proc_getpgid
+def proc_getpgid(pid: int) -> int:
+    # If a cached KinfoProc is available for the process, use that.
+    try:
+        return cast(int, _get_kinfo_proc.get_cached_value(pid).kp_eproc.e_pgid)
+    except KeyError:
+        pass
+
+    return _psposix.proc_getpgid(pid)
+
+
 proc_getsid = _psposix.proc_getsid

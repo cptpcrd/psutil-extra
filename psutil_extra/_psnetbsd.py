@@ -1,9 +1,9 @@
 # pylint: disable=too-few-public-methods
 import ctypes
 import errno
-from typing import List, Optional, Tuple
+from typing import List, Optional, Tuple, cast
 
-from . import _bsd, _psposix, _util
+from . import _bsd, _cache, _psposix, _util
 
 CTL_KERN = 1
 CTL_PROC = 10
@@ -188,6 +188,7 @@ class KinfoProc2(ctypes.Structure):
         return list(self.p_groups[: self.p_ngroups])
 
 
+@_cache.CachedByPid
 def _get_kinfo_proc2(pid: int) -> KinfoProc2:
     if pid <= 0:
         raise ProcessLookupError
@@ -206,5 +207,21 @@ def proc_getgroups(pid: int) -> List[int]:
     return _get_kinfo_proc2(pid).get_groups()
 
 
-proc_getpgid = _psposix.proc_getpgid
-proc_getsid = _psposix.proc_getsid
+def proc_getpgid(pid: int) -> int:
+    # If a cached KinfoProc is available for the process, use that.
+    try:
+        return cast(int, _get_kinfo_proc2.get_cached_value(pid).p__pgid)
+    except KeyError:
+        pass
+
+    return _psposix.proc_getpgid(pid)
+
+
+def proc_getsid(pid: int) -> int:
+    # If a cached KinfoProc is available for the process, use that.
+    try:
+        return cast(int, _get_kinfo_proc2.get_cached_value(pid).p_sid)
+    except KeyError:
+        pass
+
+    return _psposix.proc_getsid(pid)

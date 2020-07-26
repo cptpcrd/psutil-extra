@@ -2,7 +2,7 @@
 import ctypes
 from typing import List, cast
 
-from . import _bsd, _psposix
+from . import _bsd, _cache, _psposix
 
 CTL_KERN = 1
 
@@ -120,6 +120,7 @@ class KinfoProc(ctypes.Structure):
         return list(self.p_groups[: self.p_ngroups])
 
 
+@_cache.CachedByPid
 def _get_kinfo_proc(pid: int) -> KinfoProc:
     if pid <= 0:
         raise ProcessLookupError
@@ -139,6 +140,12 @@ def proc_getgroups(pid: int) -> List[int]:
 
 
 def proc_getpgid(pid: int) -> int:
+    # If a cached KinfoProc is available for the process, use that.
+    try:
+        return cast(int, _get_kinfo_proc.get_cached_value(pid).p__pgid)
+    except KeyError:
+        pass
+
     try:
         return _psposix.proc_getpgid(pid)
     except PermissionError:
@@ -146,6 +153,12 @@ def proc_getpgid(pid: int) -> int:
 
 
 def proc_getsid(pid: int) -> int:
+    # If a cached KinfoProc is available for the process, use that.
+    try:
+        return cast(int, _get_kinfo_proc.get_cached_value(pid).p_sid)
+    except KeyError:
+        pass
+
     try:
         return _psposix.proc_getsid(pid)
     except PermissionError:

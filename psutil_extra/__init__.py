@@ -3,9 +3,11 @@
 # pytype: disable=module-attr
 import resource
 import sys
-from typing import List, Optional, Tuple, Union, cast
+from typing import ContextManager, List, Optional, Tuple, Union, cast
 
 import psutil
+
+from . import _cache
 
 __version__ = "0.1.0"
 
@@ -50,6 +52,33 @@ def _get_pid(proc: Union[int, psutil.Process], *, check_running: bool = False) -
                 raise psutil.NoSuchProcess(proc.pid)
 
         return cast(int, proc.pid)
+
+
+def oneshot_proc(pid: int) -> ContextManager[None]:
+    """Similar to ``psutil.Process.oneshot()``, enables caching of values that can be
+    retrieved by the same method.
+
+    WARNING: This function differs from ``psutil.Process.oneshot()`` in two important ways:
+
+    - The process information cache is thread-local. This avoids concurrent modification issues.
+    - The caching is done by PID, not by ``psutil.Process`` instance, and as a result the cache
+      will be used regardless of whether a ``psutil.Process`` or an integer PID is passed to the
+      underlying function. For example, if ``proc_getgroups(1)`` and then
+      ``proc_getgroups(psutil.Process(1))`` are called inside a ``with oneshot_proc(1)`` block,
+      ``psutil_extra`` will use the cached information for the second call.
+
+    Args:
+        pid: The PID of the process for which information should be cached.
+
+    Yields:
+        ``None`` (a per-process cache is enabled while inside the context manager)
+
+    """
+
+    if not isinstance(pid, int):
+        raise TypeError("oneshot_proc() pid must be an integer")
+
+    return _cache.oneshot_proc(pid)
 
 
 if sys.platform.startswith(("linux", "freebsd")):

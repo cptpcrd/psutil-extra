@@ -3,29 +3,33 @@ import os
 import resource
 from typing import List, Optional, Tuple, no_type_check
 
-from . import _ffi, _psposix, _util
+from . import _cache, _ffi, _psposix, _util
 
 
-def _get_proc_status(pid: int, name: str) -> str:
+@_cache.CachedByPid
+def _get_proc_status_text(pid: int) -> str:
     try:
         with open(os.path.join(_util.get_procfs_path(), str(pid), "status")) as file:
-            for line in file:
-                if line.startswith(name + ":\t"):
-                    return line[len(name) + 2:].rstrip("\n")
-
+            return file.read()
     except FileNotFoundError:
         raise ProcessLookupError
+
+
+def _get_proc_status_field(pid: int, name: str) -> str:
+    for line in _get_proc_status_text(pid).splitlines():
+        if line.startswith(name + ":\t"):
+            return line[len(name) + 2:].rstrip("\n")
 
     raise ValueError
 
 
 def proc_getgroups(pid: int) -> List[int]:
-    return list(map(int, _get_proc_status(pid, "Groups").split()))
+    return list(map(int, _get_proc_status_field(pid, "Groups").split()))
 
 
 def proc_get_umask(pid: int) -> int:
     try:
-        umask_str = _get_proc_status(pid, "Umask")
+        umask_str = _get_proc_status_field(pid, "Umask")
     except ValueError:
         raise _ffi.build_oserror(errno.ENOTSUP)
 
