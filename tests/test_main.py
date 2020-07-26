@@ -75,3 +75,44 @@ if sys.platform.startswith(("linux", "freebsd", "dragonfly", "darwin", "netbsd",
 
         with pytest.raises(psutil.NoSuchProcess):
             psutil_extra.proc_getgroups(proc)
+
+
+if sys.platform.startswith(
+    ("linux", "freebsd", "netbsd", "openbsd", "dragonfly", "darwin", "solaris")
+):
+
+    def test_getpgid() -> None:
+        assert psutil_extra.proc_getpgid(os.getpid()) == os.getpgrp()
+
+        assert psutil_extra.proc_getpgid(1) == 1
+
+    def test_getpgid_no_proc() -> None:
+        with pytest.raises(psutil.NoSuchProcess):
+            psutil_extra.proc_getpgid(-1)
+
+        proc = fork_proc(lambda: sys.exit(0))
+        proc.wait(timeout=1)
+
+        with pytest.raises(psutil.NoSuchProcess):
+            psutil_extra.proc_getpgid(proc.pid)
+
+        with pytest.raises(psutil.NoSuchProcess):
+            psutil_extra.proc_getpgid(proc)
+
+    def test_getsid() -> None:
+        assert psutil_extra.proc_getsid(os.getpid()) == os.getsid(os.getpid())
+
+        assert psutil_extra.proc_getsid(1) == 1
+
+    def test_getsid_no_proc() -> None:
+        with pytest.raises(psutil.NoSuchProcess):
+            psutil_extra.proc_getsid(-1)
+
+        proc = fork_proc(lambda: sys.exit(0))
+        proc.wait(timeout=1)
+
+        with pytest.raises(psutil.NoSuchProcess):
+            psutil_extra.proc_getsid(proc.pid)
+
+        with pytest.raises(psutil.NoSuchProcess):
+            psutil_extra.proc_getsid(proc)
