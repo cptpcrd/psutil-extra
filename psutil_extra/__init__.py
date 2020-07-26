@@ -185,7 +185,6 @@ if sys.platform.startswith(
     def proc_getpgid(proc: Union[int, psutil.Process]) -> int:
         """Get the process group ID of the given process.
 
-
         On platforms where ``os.getpgid()`` returns EPERM for processes in other sessions,
         this function may still be able to get the process group ID for these processes.
 
