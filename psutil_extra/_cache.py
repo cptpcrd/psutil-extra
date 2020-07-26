@@ -32,7 +32,7 @@ class CachedByPid(Generic[T]):
         self._name = self.__class__.__name__ + "-" + func.__module__ + "." + func.__name__
 
     def get_cached_value(self, pid: int) -> T:
-        return cast(T, get_cache(pid, self._name))
+        return cast(T, get_cache(pid, self._name))  # pytype: disable=invalid-typevar
 
     def __call__(self, pid: int) -> T:
         try:
@@ -46,7 +46,7 @@ class CachedByPid(Generic[T]):
 
 
 @contextlib.contextmanager  # type: ignore
-def oneshot_proc(pid: int) -> Iterable[None]:
+def oneshot_proc(pid: int) -> Iterable[None]:  # pytype: disable=wrong-arg-types
     if pid in _cache_store.__dict__:  # type: ignore
         yield
     else:
