@@ -9,6 +9,17 @@ import psutil_extra
 
 from .util import fork_proc
 
+
+def test_oneshot_proc_error() -> None:
+    with pytest.raises(TypeError, match=r"^oneshot_proc\(\) pid must be an integer$"):
+        with psutil_extra.oneshot_proc(psutil.Process()):
+            pass
+
+    with pytest.raises(TypeError, match=r"^oneshot_proc\(\) pid must be an integer$"):
+        with psutil_extra.oneshot_proc(""):  # type: ignore
+            pass
+
+
 if sys.platform.startswith(("linux", "freebsd")):
 
     def test_get_umask() -> None:
