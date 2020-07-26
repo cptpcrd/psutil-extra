@@ -1,39 +1,37 @@
 import errno
 import os
 import resource
-from typing import List, Optional, Tuple, no_type_check
+from typing import Dict, List, Optional, Tuple, no_type_check
 
 from . import _cache, _ffi, _psposix, _util
 
 
 @_cache.CachedByPid
-def _get_proc_status_text(pid: int) -> str:
+def _get_proc_status_dict(pid: int) -> Dict[str, str]:
     try:
+        res = {}
+
         with open(os.path.join(_util.get_procfs_path(), str(pid), "status")) as file:
-            return file.read()
+            for line in file:
+                name, value = line.split(":\t", maxsplit=1)
+                res[name] = value.rstrip("\n")
+
+        return res
     except FileNotFoundError:
         raise ProcessLookupError
 
 
-def _get_proc_status_field(pid: int, name: str) -> str:
-    for line in _get_proc_status_text(pid).splitlines():
-        if line.startswith(name + ":\t"):
-            return line[len(name) + 2:].rstrip("\n")
-
-    raise ValueError
-
-
 def proc_getgroups(pid: int) -> List[int]:
-    return list(map(int, _get_proc_status_field(pid, "Groups").split()))
+    return list(map(int, _get_proc_status_dict(pid)["Groups"].split()))
 
 
 def proc_get_umask(pid: int) -> int:
     try:
-        umask_str = _get_proc_status_field(pid, "Umask")
-    except ValueError:
+        umask_str = _get_proc_status_dict(pid)["Umask"]
+    except KeyError:
         raise _ffi.build_oserror(errno.ENOTSUP)
-
-    return int(umask_str, 8)
+    else:
+        return int(umask_str, 8)
 
 
 @no_type_check
