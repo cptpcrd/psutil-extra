@@ -46,29 +46,21 @@ if sys.platform.startswith(("linux", "freebsd")):
 if sys.platform.startswith(("linux", "freebsd", "dragonfly", "darwin", "netbsd", "solaris")):
 
     def test_getgroups() -> None:
-        groups = set(psutil_extra.proc_getgroups(os.getpid()))
-        groups_alt = set(psutil_extra.proc_getgroups(psutil.Process(os.getpid())))
+        groups = psutil_extra.proc_getgroups(os.getpid())
+        groups_alt = psutil_extra.proc_getgroups(psutil.Process(os.getpid()))
 
         # Check for internal consistency when using PIDs vs psutil.Processes
         assert set(groups) == set(groups_alt)
 
         cur_groups = os.getgroups()
-        if sys.platform.startswith(("freebsd", "darwin", "netbsd")):
-            # These platforms may truncate the group list.
 
-            if cur_groups:
-                # We have at least one supplementary group.
-                # Make sure that the list we got isn't empty
-                assert groups
-
-                # Also make sure it doesn't contain any "extra" groups
-                assert set(groups) <= set(cur_groups)
-            else:
-                # No supplementary groups; make sure the list we
-                # got confirms that.
-                assert not groups
+        if sys.platform.startswith("darwin"):
+            # In macOS 10.5, Apple decided to change the behavior of getgroups() to make
+            # it non-POSIX compliant and not an accurate reflection of the process's
+            # supplementary group list. <sigh>
+            assert set(groups) <= set(cur_groups)
         else:
-            # Linux shouldn't truncate the group list.
+            # Check that the group list matches
             assert set(groups) == set(cur_groups)
 
     def test_getgroups_no_proc() -> None:

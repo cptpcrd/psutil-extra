@@ -38,6 +38,11 @@ instance or an ``int`` representing a process ID.
        Currently, on Windows Subsystem for Linux 1 (not tested on WSL 2), this
        function succeeds but always returns an empty list.
 
+   .. note::
+       On macOS, this function's behavior differs from that of
+       `os.getgroups() <https://docs.python.org/3/library/os.html#os.getgroups>`.
+       Effectively, it always behaves as if the deployment target is less than 10.5.
+
    :param proc:
        The process to get the supplementary group list for. This can be either a
        ``psutil.Process`` or an ``int`` representing a PID.
