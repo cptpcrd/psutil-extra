@@ -71,7 +71,7 @@ jobs:
         run: pipenv install --dev --deploy
 
       - name: Run tests
-        run: pipenv run pytest --cov-report=xml tests/
+        run: pipenv run pytest --cov-report=xml --verbose tests/
 
       - name: Upload coverage to Codecov
         uses: codecov/codecov-action@v1.0.7
