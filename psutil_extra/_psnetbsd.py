@@ -208,20 +208,16 @@ def proc_getgroups(pid: int) -> List[int]:
 
 
 def proc_getpgid(pid: int) -> int:
-    # If a cached KinfoProc is available for the process, use that.
-    try:
+    if _cache.is_enabled(pid):
+        # We're in a oneshot_proc(); retrieve extra information
         return cast(int, _get_kinfo_proc2.get_cached_value(pid).p__pgid)
-    except KeyError:
-        pass
-
-    return _psposix.proc_getpgid(pid)
+    else:
+        return _psposix.proc_getpgid(pid)
 
 
 def proc_getsid(pid: int) -> int:
-    # If a cached KinfoProc is available for the process, use that.
-    try:
+    if _cache.is_enabled(pid):
+        # We're in a oneshot_proc(); retrieve extra information
         return cast(int, _get_kinfo_proc2.get_cached_value(pid).p_sid)
-    except KeyError:
-        pass
-
-    return _psposix.proc_getsid(pid)
+    else:
+        return _psposix.proc_getsid(pid)

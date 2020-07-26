@@ -75,5 +75,17 @@ def proc_getrlimit(pid: int, res: int) -> Tuple[int, int]:
         raise ValueError("invalid resource specified")
 
 
-proc_getpgid = _psposix.proc_getpgid
-proc_getsid = _psposix.proc_getsid
+def proc_getpgid(pid: int) -> int:
+    if _cache.is_enabled(pid):
+        # We're in a oneshot_proc(); retrieve extra information
+        return _get_proc_status_fields(pid)[3]
+    else:
+        return _psposix.proc_getpgid(pid)
+
+
+def proc_getsid(pid: int) -> int:
+    if _cache.is_enabled(pid):
+        # We're in a oneshot_proc(); retrieve extra information
+        return _get_proc_status_fields(pid)[4]
+    else:
+        return _psposix.proc_getsid(pid)

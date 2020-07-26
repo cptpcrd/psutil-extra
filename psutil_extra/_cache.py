@@ -19,6 +19,10 @@ def store_cache(pid: int, name: str, value: Any) -> None:
         data[name] = value
 
 
+def is_enabled(pid: int) -> bool:
+    return pid in _cache_store.__dict__  # type: ignore
+
+
 T = TypeVar("T")
 
 
