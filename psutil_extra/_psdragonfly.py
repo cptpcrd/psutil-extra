@@ -60,3 +60,4 @@ def proc_get_rlimit(pid: int, res: int) -> Tuple[int, int]:
 
 
 proc_getpgid = _psposix.proc_getpgid
+proc_getsid = _psposix.proc_getsid

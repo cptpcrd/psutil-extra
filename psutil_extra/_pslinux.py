@@ -52,3 +52,4 @@ def proc_rlimit(
 proc_getrlimit = proc_rlimit
 
 proc_getpgid = _psposix.proc_getpgid
+proc_getsid = _psposix.proc_getsid

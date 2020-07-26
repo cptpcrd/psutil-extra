@@ -143,3 +143,10 @@ def proc_getpgid(pid: int) -> int:
         return _psposix.proc_getpgid(pid)
     except PermissionError:
         return cast(int, _get_kinfo_proc(pid).p__pgid)
+
+
+def proc_getsid(pid: int) -> int:
+    try:
+        return _psposix.proc_getsid(pid)
+    except PermissionError:
+        return cast(int, _get_kinfo_proc(pid).p_sgid)

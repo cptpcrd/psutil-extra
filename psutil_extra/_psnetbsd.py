@@ -207,3 +207,4 @@ def proc_getgroups(pid: int) -> List[int]:
 
 
 proc_getpgid = _psposix.proc_getpgid
+proc_getsid = _psposix.proc_getsid

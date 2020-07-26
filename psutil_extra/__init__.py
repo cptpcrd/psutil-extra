@@ -205,3 +205,27 @@ if sys.platform.startswith(
             raise psutil.NoSuchProcess(pid)
         except PermissionError:
             raise psutil.AccessDenied(pid)
+
+    def proc_getsid(proc: Union[int, psutil.Process]) -> int:
+        """Get the sessopm ID of the given process.
+
+        On platforms where ``os.getsid()`` returns EPERM for processes in other sessions,
+        this function may still be able to get the session ID for these processes.
+
+        Args:
+            proc: Either an integer PID or a ``psutil.Process`` specifying the process
+                to operate on.
+
+        Returns:
+            The session ID of the given process.
+
+        """
+
+        pid = _get_pid(proc)
+
+        try:
+            return _psimpl.proc_getsid(pid)
+        except ProcessLookupError:
+            raise psutil.NoSuchProcess(pid)
+        except PermissionError:
+            raise psutil.AccessDenied(pid)

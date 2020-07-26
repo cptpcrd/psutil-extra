@@ -124,6 +124,23 @@ instance or an ``int`` representing a process ID.
    Availability: Linux, FreeBSD, NetBSD, DragonflyBSD, OpenBSD, macOS
 
 
+.. py:function:: proc_getsid(proc)
+
+   Get the session ID of the given process.
+
+   On platforms where ``os.getsid()`` returns EPERM for processes in other sessions,
+   this function may still be able to get the session ID for these processes.
+
+   :param proc:
+       The process to get the session ID for. This can be either a
+       ``psutil.Process`` or an ``int`` representing a PID.
+   :type proc: int or psutil.Process
+   :returns: The session ID of the given process
+   :rtype: int
+
+   Availability: Linux, FreeBSD, NetBSD, DragonflyBSD, OpenBSD, macOS
+
+
 Error handling
 ==============
 
