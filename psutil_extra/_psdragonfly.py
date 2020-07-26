@@ -25,7 +25,7 @@ RESOURCE_VALUES = {
 
 
 @_cache.CachedByPid
-def _get_proc_status_fields(pid: int) -> List[int]:
+def _get_proc_status_fields(pid: int) -> List[str]:
     try:
         with open(os.path.join(_util.get_procfs_path(), str(pid), "status")) as file:
             return file.read().rstrip("\n").split(" ")
@@ -78,7 +78,7 @@ def proc_getrlimit(pid: int, res: int) -> Tuple[int, int]:
 def proc_getpgid(pid: int) -> int:
     if _cache.is_enabled(pid):
         # We're in a oneshot_proc(); retrieve extra information
-        return _get_proc_status_fields(pid)[3]
+        return int(_get_proc_status_fields(pid)[3])
     else:
         return _psposix.proc_getpgid(pid)
 
@@ -86,6 +86,6 @@ def proc_getpgid(pid: int) -> int:
 def proc_getsid(pid: int) -> int:
     if _cache.is_enabled(pid):
         # We're in a oneshot_proc(); retrieve extra information
-        return _get_proc_status_fields(pid)[4]
+        return int(_get_proc_status_fields(pid)[4])
     else:
         return _psposix.proc_getsid(pid)
