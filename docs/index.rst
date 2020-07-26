@@ -107,6 +107,23 @@ instance or an ``int`` representing a process ID.
    Availability: Linux, FreeBSD, NetBSD, DragonflyBSD
 
 
+.. py:function:: proc_getpgid(proc)
+
+   Get the process group ID of the given process.
+
+   On platforms where ``os.getpgid()`` returns EPERM for processes in other sessions,
+   this function may still be able to get the process group ID for these processes.
+
+   :param proc:
+       The process to get the process group ID for. This can be either a
+       ``psutil.Process`` or an ``int`` representing a PID.
+   :type proc: int or psutil.Process
+   :returns: The process group ID of the given process
+   :rtype: int
+
+   Availability: Linux, FreeBSD, NetBSD, DragonflyBSD, OpenBSD, macOS
+
+
 Error handling
 ==============
 
