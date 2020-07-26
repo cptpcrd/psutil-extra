@@ -29,9 +29,18 @@ if sys.platform.startswith(("linux", "freebsd")):
 
         assert psutil_extra.proc_get_umask(psutil.Process(os.getpid())) == mask
 
+        with psutil_extra.oneshot_proc(os.getpid()):
+            assert mask == psutil_extra.proc_get_umask(os.getpid())
+
+            assert mask == psutil_extra.proc_get_umask(psutil.Process(os.getpid()))
+
     def test_get_umask_no_proc() -> None:
         with pytest.raises(psutil.NoSuchProcess):
             psutil_extra.proc_get_umask(-1)
+
+        with psutil_extra.oneshot_proc(-1):
+            with pytest.raises(psutil.NoSuchProcess):
+                psutil_extra.proc_get_umask(-1)
 
         proc = fork_proc(lambda: sys.exit(0))
         proc.wait(timeout=1)
@@ -42,6 +51,13 @@ if sys.platform.startswith(("linux", "freebsd")):
         with pytest.raises(psutil.NoSuchProcess):
             psutil_extra.proc_get_umask(proc)
 
+        with psutil_extra.oneshot_proc(proc.pid):
+            with pytest.raises(psutil.NoSuchProcess):
+                psutil_extra.proc_get_umask(proc.pid)
+
+            with pytest.raises(psutil.NoSuchProcess):
+                psutil_extra.proc_get_umask(proc)
+
 
 if sys.platform.startswith(("linux", "freebsd", "dragonfly", "darwin", "netbsd", "solaris")):
 
@@ -51,6 +67,11 @@ if sys.platform.startswith(("linux", "freebsd", "dragonfly", "darwin", "netbsd",
 
         # Check for internal consistency when using PIDs vs psutil.Processes
         assert set(groups) == set(groups_alt)
+
+        # And when using oneshot_proc()
+        with psutil_extra.oneshot_proc(os.getpid()):
+            assert set(groups) == set(psutil_extra.proc_getgroups(os.getpid()))
+            assert set(groups) == set(psutil_extra.proc_getgroups(psutil.Process(os.getpid())))
 
         cur_groups = os.getgroups()
 
@@ -67,6 +88,10 @@ if sys.platform.startswith(("linux", "freebsd", "dragonfly", "darwin", "netbsd",
         with pytest.raises(psutil.NoSuchProcess):
             psutil_extra.proc_getgroups(-1)
 
+        with psutil_extra.oneshot_proc(-1):
+            with pytest.raises(psutil.NoSuchProcess):
+                psutil_extra.proc_getgroups(-1)
+
         proc = fork_proc(lambda: sys.exit(0))
         proc.wait(timeout=1)
 
@@ -76,6 +101,13 @@ if sys.platform.startswith(("linux", "freebsd", "dragonfly", "darwin", "netbsd",
         with pytest.raises(psutil.NoSuchProcess):
             psutil_extra.proc_getgroups(proc)
 
+        with psutil_extra.oneshot_proc(proc.pid):
+            with pytest.raises(psutil.NoSuchProcess):
+                psutil_extra.proc_getgroups(proc.pid)
+
+            with pytest.raises(psutil.NoSuchProcess):
+                psutil_extra.proc_getgroups(proc)
+
 
 if sys.platform.startswith(
     ("linux", "freebsd", "netbsd", "openbsd", "dragonfly", "darwin", "solaris")
@@ -84,11 +116,21 @@ if sys.platform.startswith(
     def test_getpgid() -> None:
         assert psutil_extra.proc_getpgid(os.getpid()) == os.getpgrp()
 
+        with psutil_extra.oneshot_proc(os.getpid()):
+            assert psutil_extra.proc_getpgid(os.getpid()) == os.getpgrp()
+
         assert psutil_extra.proc_getpgid(1) == 1
+
+        with psutil_extra.oneshot_proc(1):
+            assert psutil_extra.proc_getpgid(1) == 1
 
     def test_getpgid_no_proc() -> None:
         with pytest.raises(psutil.NoSuchProcess):
             psutil_extra.proc_getpgid(-1)
+
+        with psutil_extra.oneshot_proc(-1):
+            with pytest.raises(psutil.NoSuchProcess):
+                psutil_extra.proc_getpgid(-1)
 
         proc = fork_proc(lambda: sys.exit(0))
         proc.wait(timeout=1)
@@ -99,14 +141,31 @@ if sys.platform.startswith(
         with pytest.raises(psutil.NoSuchProcess):
             psutil_extra.proc_getpgid(proc)
 
+        with psutil_extra.oneshot_proc(proc.pid):
+            with pytest.raises(psutil.NoSuchProcess):
+                psutil_extra.proc_getpgid(proc.pid)
+
+            with pytest.raises(psutil.NoSuchProcess):
+                psutil_extra.proc_getpgid(proc)
+
     def test_getsid() -> None:
         assert psutil_extra.proc_getsid(os.getpid()) == os.getsid(os.getpid())
 
+        with psutil_extra.oneshot_proc(os.getpid()):
+            assert psutil_extra.proc_getsid(os.getpid()) == os.getsid(os.getpid())
+
         assert psutil_extra.proc_getsid(1) == 1
+
+        with psutil_extra.oneshot_proc(1):
+            assert psutil_extra.proc_getsid(1) == 1
 
     def test_getsid_no_proc() -> None:
         with pytest.raises(psutil.NoSuchProcess):
             psutil_extra.proc_getsid(-1)
+
+        with psutil_extra.oneshot_proc(-1):
+            with pytest.raises(psutil.NoSuchProcess):
+                psutil_extra.proc_getsid(-1)
 
         proc = fork_proc(lambda: sys.exit(0))
         proc.wait(timeout=1)
@@ -116,3 +175,10 @@ if sys.platform.startswith(
 
         with pytest.raises(psutil.NoSuchProcess):
             psutil_extra.proc_getsid(proc)
+
+        with psutil_extra.oneshot_proc(proc.pid):
+            with pytest.raises(psutil.NoSuchProcess):
+                psutil_extra.proc_getsid(proc.pid)
+
+            with pytest.raises(psutil.NoSuchProcess):
+                psutil_extra.proc_getsid(proc)
