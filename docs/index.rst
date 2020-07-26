@@ -14,8 +14,11 @@ instance or an ``int`` representing a process ID.
 
 .. py:function:: oneshot_proc(pid)
 
-   Similar to ``psutil.Process.oneshot()``, enables caching of values that can be
-   retrieved by the same method for the given PID.
+   Similar to ``psutil.Process.oneshot()``, when this is used as a context manager it enables
+   caching of values that can be retrieved by the same method for the given PID.
+
+   :param int pid:
+        The PID of the process for which caching should be enabled.
 
    .. warning::
         This function differs from ``psutil.Process.oneshot()`` in two important ways:
@@ -32,9 +35,38 @@ instance or an ``int`` representing a process ID.
                    proc_getgroups(1)  # Uses the cached information
                    proc_getgroups(psutil.Process(1))  # Also uses the cached information
 
+   .. note::
+        Do not use this context manager unless you plan to retrieve multiple pieces of information.
 
-   :param int pid:
-        The PID of the process for which caching should be enabled.
+        As noted in the table below, some functions, when called inside a :py:func:`oneshot_proc()`
+        manager, will retrieve the requested information in a way that retrieves as much additional
+        information as possible. While this means that the cached information can then be used later
+        for performance improvements, it is also very wasteful if the information is *not* used.
+
+   Here is a table, in the same format as `psutil.Process.oneshot()'s table
+   <https://psutil.readthedocs.io/en/latest/#psutil.Process.oneshot>`_, that shows which methods can
+   be grouped together for greater efficiency:
+
++------------------------------+--------------------------------+--------------------------------+--------------------------------+----------------------------------+
+| **Linux**                    | **macOS**                      | **NetBSD**                     | **OpenBSD**                    | **DragonFlyBSD**                 |
++------------------------------+--------------------------------+--------------------------------+--------------------------------+----------------------------------+
+| :py:func:`proc_getgroups()`  | :py:func:`proc_getgroups()`    | :py:func:`proc_getgroups()`    | :py:func:`proc_getgroups()`    | :py:func:`proc_getgroups()`      |
++------------------------------+--------------------------------+--------------------------------+--------------------------------+----------------------------------+
+| :py:func:`proc_get_umask()`  | :py:func:`proc_getpgid()` [1]_ | :py:func:`proc_getpgid()` [1]_ | :py:func:`proc_getpgid()` [1]_ | :py:func:`proc_getpgid()` [1]_   |
++------------------------------+--------------------------------+--------------------------------+--------------------------------+----------------------------------+
+|                              | :py:func:`proc_getsid()` [1]_  | :py:func:`proc_getsid()` [1]_  | :py:func:`proc_getsid()` [1]_  | :py:func:`proc_getsid()` [1]_    |
++------------------------------+--------------------------------+--------------------------------+--------------------------------+----------------------------------+
+|                              |                                |                                |                                |                                  |
++------------------------------+--------------------------------+--------------------------------+--------------------------------+----------------------------------+
+|                              |                                |                                |                                | :py:func:`proc_getrlimit()` [2]_ |
++------------------------------+--------------------------------+--------------------------------+--------------------------------+----------------------------------+
+
+.. [1] These functions, when called inside a ``oneshot_proc()`` context manager, will retrieve the
+   requested information in a different way that collects as much extra information as possible about
+   the process for later use.
+
+.. [2] On DragonFlyBSD, the first call to ``proc_getrlimit()`` inside a ``oneshot_proc()`` will retrieve all
+   of the resource limits and cache them. Further calls to ``proc_getrlimit()`` will use this cache.
 
 
 .. py:function:: proc_get_umask(proc)
