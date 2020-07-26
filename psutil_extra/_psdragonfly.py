@@ -66,7 +66,7 @@ def proc_getgroups(pid: int) -> List[int]:
     return list(map(int, _get_proc_status_fields(pid)[13].split(",")[1:]))
 
 
-def proc_get_rlimit(pid: int, res: int) -> Tuple[int, int]:
+def proc_getrlimit(pid: int, res: int) -> Tuple[int, int]:
     limits = _get_proc_rlimits(pid)
 
     try:
