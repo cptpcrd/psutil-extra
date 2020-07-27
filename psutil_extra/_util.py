@@ -3,14 +3,14 @@ from typing import cast
 
 import psutil
 
-_resource_nums = set()
+RESOURCE_NUMS = set()
 for name in dir(resource):
     if name.startswith("RLIMIT_"):
-        _resource_nums.add(getattr(resource, name))
+        RESOURCE_NUMS.add(getattr(resource, name))
 
 
 def check_rlimit_resource(res: int) -> None:
-    if res not in _resource_nums:
+    if res not in RESOURCE_NUMS:
         raise ValueError("invalid resource specified")
 
 
