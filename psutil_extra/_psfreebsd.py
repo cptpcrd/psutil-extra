@@ -303,7 +303,7 @@ def proc_get_sigmasks(pid: int) -> ProcessSignalMasks:
 def proc_getpgid(pid: int) -> int:
     if _cache.is_enabled(pid):
         # We're in a oneshot_proc(); retrieve extra information
-        return cast(int, _get_kinfo_proc(pid).p_pgid)
+        return cast(int, _get_kinfo_proc(pid).ki_pgid)
     else:
         return _psposix.proc_getpgid(pid)
 
@@ -311,6 +311,6 @@ def proc_getpgid(pid: int) -> int:
 def proc_getsid(pid: int) -> int:
     if _cache.is_enabled(pid):
         # We're in a oneshot_proc(); retrieve extra information
-        return cast(int, _get_kinfo_proc(pid).p_sid)
+        return cast(int, _get_kinfo_proc(pid).ki_sid)
     else:
         return _psposix.proc_getsid(pid)
