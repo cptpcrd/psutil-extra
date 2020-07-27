@@ -183,7 +183,7 @@ instance or an ``int`` representing a process ID.
    :type proc: int or psutil.Process
    :returns: A dataclass containing the fields listed above
 
-   Availability: Linux, OpenBSD, NetBSD, macOS
+   Availability: Linux, OpenBSD, NetBSD, FreeBSD, macOS
 
 
 .. py:function:: proc_getpgid(proc)
