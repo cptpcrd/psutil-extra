@@ -2,7 +2,8 @@
 import ctypes
 from typing import List, cast
 
-from . import _bsd, _cache, _psposix
+from . import _bsd, _cache, _psposix, _util
+from ._util import ProcessSignalMasks
 
 CTL_KERN = 1
 
@@ -137,6 +138,17 @@ def _get_kinfo_proc(pid: int) -> KinfoProc:
 
 def proc_getgroups(pid: int) -> List[int]:
     return _get_kinfo_proc(pid).get_groups()
+
+
+def proc_get_sigmasks(pid: int) -> ProcessSignalMasks:
+    kinfo = _get_kinfo_proc(pid)
+
+    return ProcessSignalMasks(
+        pending=_util.expand_sig_bitmask(kinfo.p_siglist),
+        blocked=_util.expand_sig_bitmask(kinfo.p_sigmask),
+        ignored=_util.expand_sig_bitmask(kinfo.p_sigignore),
+        caught=_util.expand_sig_bitmask(kinfo.p_sigcatch),
+    )
 
 
 def proc_getpgid(pid: int) -> int:

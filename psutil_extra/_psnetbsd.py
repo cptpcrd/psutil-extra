@@ -4,6 +4,7 @@ import errno
 from typing import List, Optional, Tuple, cast
 
 from . import _bsd, _cache, _psposix, _util
+from ._util import ProcessSignalMasks
 
 CTL_KERN = 1
 CTL_PROC = 10
@@ -84,6 +85,19 @@ class KiSigset(ctypes.Structure):
     _fields_ = [
         ("bits", (ctypes.c_uint32 * 4)),
     ]
+
+    def pack(self) -> int:
+        # https://github.com/IIJ-NetBSD/netbsd-src/blob/e4505e0610ceb1b2db8e2a9ed607b4bfa076aa2f/sys/sys/sigtypes.h
+
+        return cast(
+            int,
+            (
+                (self.bits[0] & 0b11111)
+                | (self.bits[1] & 0b1111100000)
+                | (self.bits[2] & 0b111110000000000)
+                | (self.bits[3] & 0b11111000000000000000)
+            ),
+        )
 
 
 class KinfoProc2(ctypes.Structure):
@@ -205,6 +219,17 @@ def _get_kinfo_proc2(pid: int) -> KinfoProc2:
 
 def proc_getgroups(pid: int) -> List[int]:
     return _get_kinfo_proc2(pid).get_groups()
+
+
+def proc_get_sigmasks(pid: int) -> ProcessSignalMasks:
+    kinfo = _get_kinfo_proc2(pid)
+
+    return ProcessSignalMasks(
+        pending=_util.expand_sig_bitmask(kinfo.p_siglist.pack()),
+        blocked=_util.expand_sig_bitmask(kinfo.p_sigmask.pack()),
+        ignored=_util.expand_sig_bitmask(kinfo.p_sigignore.pack()),
+        caught=_util.expand_sig_bitmask(kinfo.p_sigcatch.pack()),
+    )
 
 
 def proc_getpgid(pid: int) -> int:

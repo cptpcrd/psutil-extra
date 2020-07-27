@@ -207,6 +207,39 @@ if sys.platform.startswith(("linux", "freebsd", "netbsd", "dragonfly")):
             raise psutil.AccessDenied(pid)
 
 
+if sys.platform.startswith(("linux", "openbsd", "netbsd", "darwin")):
+
+    def proc_get_sigmasks(proc: Union[int, psutil.Process]) -> _psimpl.ProcessSignalMasks:
+        """Get the signal masks of the given process. Returns a dataclass containing
+        several fields:
+
+        - ``pending`` (not on macOS): The set of pending signals for the process.
+        - ``blocked`` (not on macOS): The set of signals that the process has blocked.
+        - ``ignored``: The set of signals that the process has ignored.
+        - ``caught``: The set of signals that the process has registered signal
+          handlers for.
+        - ``process_pending`` (Linux): The set of pending signals for the entire process,
+          not just the specified thread.
+
+        Args:
+            proc: Either an integer PID or a ``psutil.Process`` specifying the process
+                to operate on.
+
+        Returns:
+            A dataclass containing the fields listed above.
+
+        """
+
+        pid = _get_pid(proc)
+
+        try:
+            return _psimpl.proc_get_sigmasks(pid)
+        except ProcessLookupError:
+            raise psutil.NoSuchProcess(pid)
+        except PermissionError:
+            raise psutil.AccessDenied(pid)
+
+
 if sys.platform.startswith(
     ("linux", "freebsd", "netbsd", "openbsd", "dragonfly", "darwin", "solaris")
 ):

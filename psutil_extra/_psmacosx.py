@@ -1,8 +1,9 @@
 # pylint: disable=invalid-name,too-few-public-methods
 import ctypes
-from typing import List, cast
+import dataclasses
+from typing import List, Set, cast
 
-from . import _cache, _psposix
+from . import _cache, _psposix, _util
 from ._bsd import sysctl_raw
 from ._ffi import gid_t, load_libc, pid_t, uid_t
 
@@ -25,6 +26,12 @@ u_quad_t = ctypes.c_uint64
 time_t = ctypes.c_long
 suseconds_t = ctypes.c_int32
 sigset_t = ctypes.c_uint32
+
+
+@dataclasses.dataclass
+class ProcessSignalMasks:
+    ignored: Set[int]
+    caught: Set[int]
 
 
 class Timeval(ctypes.Structure):
@@ -188,6 +195,15 @@ def _get_kinfo_proc(pid: int) -> KinfoProc:
 
 def proc_getgroups(pid: int) -> List[int]:
     return _get_kinfo_proc(pid).get_groups()
+
+
+def proc_get_sigmasks(pid: int) -> ProcessSignalMasks:
+    kinfo = _get_kinfo_proc(pid)
+
+    return ProcessSignalMasks(
+        ignored=_util.expand_sig_bitmask(kinfo.kp_proc.p_sigignore),
+        caught=_util.expand_sig_bitmask(kinfo.kp_proc.p_sigcatch),
+    )
 
 
 def proc_getpgid(pid: int) -> int:

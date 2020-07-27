@@ -1,9 +1,19 @@
+import dataclasses
 import errno
 import os
 import resource
-from typing import Dict, List, Optional, Tuple, no_type_check
+from typing import Dict, List, Optional, Set, Tuple, no_type_check
 
 from . import _cache, _ffi, _psposix, _util
+
+
+@dataclasses.dataclass
+class ProcessSignalMasks(_util.ProcessSignalMasks):
+    process_pending: Set[int]
+
+
+def parse_sigmask(raw_mask: str) -> Set[int]:
+    return _util.expand_sig_bitmask(int(raw_mask, 16))
 
 
 @_cache.CachedByPid
@@ -32,6 +42,18 @@ def proc_get_umask(pid: int) -> int:
         raise _ffi.build_oserror(errno.ENOTSUP)
     else:
         return int(umask_str, 8)
+
+
+def proc_get_sigmasks(pid: int) -> ProcessSignalMasks:
+    proc_status = _get_proc_status_dict(pid)
+
+    return ProcessSignalMasks(
+        process_pending=parse_sigmask(proc_status["ShdPnd"]),
+        pending=parse_sigmask(proc_status["SigPnd"]),
+        blocked=parse_sigmask(proc_status["SigBlk"]),
+        ignored=parse_sigmask(proc_status["SigIgn"]),
+        caught=parse_sigmask(proc_status["SigCgt"]),
+    )
 
 
 @no_type_check

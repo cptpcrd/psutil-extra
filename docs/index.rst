@@ -164,6 +164,28 @@ instance or an ``int`` representing a process ID.
    Availability: Linux, FreeBSD, NetBSD, DragonflyBSD
 
 
+.. py:function:: proc_get_sigmasks(proc, resource)
+
+   Get the signal masks of the given process. Returns a dataclass containing
+   several fields:
+
+   * ``pending`` (not on macOS): The set of pending signals for the process.
+   * ``blocked`` (not on macOS): The set of signals that the process has blocked.
+   * ``ignored``: The set of signals that the process has ignored.
+   * ``caught``: The set of signals that the process has registered signal
+     handlers for.
+   * ``process_pending`` (Linux): The set of pending signals for the entire process, not
+     just the specified thread.
+
+   :param proc:
+       The process to get the resource limits for. This can be either a
+       ``psutil.Process`` or an ``int`` representing a PID.
+   :type proc: int or psutil.Process
+   :returns: A dataclass containing the fields listed above
+
+   Availability: Linux, OpenBSD, NetBSD, macOS
+
+
 .. py:function:: proc_getpgid(proc)
 
    Get the process group ID of the given process.
