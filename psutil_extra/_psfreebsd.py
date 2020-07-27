@@ -8,6 +8,7 @@ import sys
 from typing import List, Optional, Tuple, cast
 
 from . import _bsd, _cache, _ffi, _psposix, _util
+from ._util import ProcessSignalMasks
 
 CTL_KERN = 1
 KERN_PROC = 14
@@ -289,7 +290,7 @@ proc_getrlimit = proc_rlimit
 
 
 def proc_get_sigmasks(pid: int) -> ProcessSignalMasks:
-    kinfo = _get_kinfo_proc2(pid)
+    kinfo = _get_kinfo_proc(pid)
 
     return ProcessSignalMasks(
         pending=_util.expand_sig_bitmask(kinfo.ki_siglist.pack()),
