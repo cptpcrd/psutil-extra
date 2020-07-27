@@ -47,7 +47,7 @@ def proc_get_umask(pid: int) -> int:
 def proc_get_sigmasks(pid: int) -> ProcessSignalMasks:
     proc_status = _get_proc_status_dict(pid)
 
-    return ProcessSignalMasks(
+    return ProcessSignalMasks(  # pytype: disable=wrong-keyword-args
         process_pending=parse_sigmask(proc_status["ShdPnd"]),
         pending=parse_sigmask(proc_status["SigPnd"]),
         blocked=parse_sigmask(proc_status["SigBlk"]),
