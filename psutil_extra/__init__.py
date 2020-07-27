@@ -207,7 +207,7 @@ if sys.platform.startswith(("linux", "freebsd", "netbsd", "dragonfly")):
             raise psutil.AccessDenied(pid)
 
 
-if sys.platform.startswith(("linux", "openbsd", "netbsd", "darwin")):
+if sys.platform.startswith(("linux", "freebsd", "openbsd", "netbsd", "darwin")):
 
     def proc_get_sigmasks(proc: Union[int, psutil.Process]) -> _psimpl.ProcessSignalMasks:
         """Get the signal masks of the given process. Returns a dataclass containing
