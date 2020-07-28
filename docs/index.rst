@@ -177,6 +177,10 @@ instance or an ``int`` representing a process ID.
    * ``process_pending`` (Linux): The set of pending signals for the entire process, not
      just the specified thread.
 
+   .. note::
+       Currently, on Windows Subsystem for Linux 1 (not tested on WSL 2), this
+       function succeeds but always returns empty sets for all fields.
+
    :param proc:
        The process to get the resource limits for. This can be either a
        ``psutil.Process`` or an ``int`` representing a PID.
