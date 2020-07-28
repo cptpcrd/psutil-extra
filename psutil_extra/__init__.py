@@ -208,10 +208,11 @@ if sys.platform.startswith(("linux", "freebsd", "netbsd", "dragonfly")):
 
 
 if sys.platform.startswith(("linux", "darwin", "freebsd", "openbsd", "netbsd")):
+    ProcessSignalMasks = _psimpl.ProcessSignalMasks  # pytype: disable=attribute-error
 
-    def proc_get_sigmasks(  # pytype: disable=attribute-error,invalid-annotation
+    def proc_get_sigmasks(  # pytype: disable=invalid-annotation
         proc: Union[int, psutil.Process]
-    ) -> _psimpl.ProcessSignalMasks:  # pytype: disable=attribute-error,invalid-annotation
+    ) -> ProcessSignalMasks:
         """Get the signal masks of the given process. Returns a dataclass containing
         several fields:
 
