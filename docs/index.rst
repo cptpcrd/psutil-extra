@@ -108,7 +108,7 @@ instance or an ``int`` representing a process ID.
        A list of the given process's current supplementary groups.
    :rtype: list[int]
 
-   Availability: Linux, macOS, FreeBSD, OpenBSD, NetBSD, DragonflyBSD, Solaris
+   Availability: Linux, macOS, FreeBSD, OpenBSD, NetBSD, DragonFlyBSD, Solaris
 
 
 .. py:function:: proc_rlimit(proc, resource, new_limits=None)
@@ -161,7 +161,7 @@ instance or an ``int`` representing a process ID.
    :returns: A ``(soft, hard)`` tuple representing the current resource limits.
    :rtype: tuple[int, int]
 
-   Availability: Linux, FreeBSD, NetBSD, DragonflyBSD
+   Availability: Linux, FreeBSD, NetBSD, DragonFlyBSD
 
 
 .. py:function:: proc_get_sigmasks(proc, resource)
@@ -204,7 +204,7 @@ instance or an ``int`` representing a process ID.
    :returns: The process group ID of the given process
    :rtype: int
 
-   Availability: Linux, macOS, FreeBSD, OpenBSD, NetBSD, DragonflyBSD
+   Availability: Linux, macOS, FreeBSD, OpenBSD, NetBSD, DragonFlyBSD
 
 
 .. py:function:: proc_getsid(proc)
@@ -221,7 +221,7 @@ instance or an ``int`` representing a process ID.
    :returns: The session ID of the given process
    :rtype: int
 
-   Availability: Linux, macOS, FreeBSD, OpenBSD, NetBSD, DragonflyBSD
+   Availability: Linux, macOS, FreeBSD, OpenBSD, NetBSD, DragonFlyBSD
 
 
 Error handling
