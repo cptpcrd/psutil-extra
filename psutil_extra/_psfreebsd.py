@@ -80,7 +80,7 @@ class Sigset(ctypes.Structure):
         # https://github.com/freebsd/freebsd/blob/5f6c3c7df6e969e83bf9e64f76290d411c6e2069/sys/sys/_sigset.h
         # https://github.com/freebsd/freebsd/blob/c2d0d7c3d08302498a7a85fc059772b0533b63f9/sys/sys/signalvar.h
 
-        return self.bits[0]
+        return cast(int, self.bits[0])
 
 
 class Timeval(ctypes.Structure):

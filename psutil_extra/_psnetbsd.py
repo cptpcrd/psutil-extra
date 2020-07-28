@@ -89,7 +89,7 @@ class KiSigset(ctypes.Structure):
     def pack(self) -> int:
         # https://github.com/IIJ-NetBSD/netbsd-src/blob/e4505e0610ceb1b2db8e2a9ed607b4bfa076aa2f/sys/sys/sigtypes.h
 
-        return self.bits[0]
+        return cast(int, self.bits[0])
 
 
 class KinfoProc2(ctypes.Structure):
