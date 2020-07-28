@@ -217,7 +217,7 @@ class KinfoProc(ctypes.Structure):
 
 @_cache.CachedByPid
 def _get_kinfo_proc(pid: int) -> KinfoProc:
-    if pid <= 0:
+    if pid < 0:
         raise ProcessLookupError
 
     proc_info = KinfoProc()
@@ -231,8 +231,13 @@ def _get_kinfo_proc(pid: int) -> KinfoProc:
 
 
 def proc_get_umask(pid: int) -> int:
-    if pid <= 0:
+    if pid < 0:
         raise ProcessLookupError
+    elif pid == 0:
+        # Unlike the other FreeBSD functions, we can't accept pid=0, because the
+        # KERN_PROC_UMASK sysctl uses that to mean the current process.
+        # It won't produce the desired effect of actually operating on PID 0.
+        raise _ffi.build_oserror(errno.ENOTSUP)
 
     umask = ctypes.c_ushort()
 
@@ -248,7 +253,7 @@ def proc_getgroups(pid: int) -> List[int]:
         # We're in a oneshot_proc(); retrieve extra information
         return _get_kinfo_proc(pid).get_groups()
 
-    if pid <= 0:
+    if pid < 0:
         raise ProcessLookupError
 
     while True:
@@ -264,7 +269,7 @@ def proc_getgroups(pid: int) -> List[int]:
 def proc_rlimit(
     pid: int, res: int, new_limits: Optional[Tuple[int, int]] = None
 ) -> Tuple[int, int]:
-    if pid <= 0:
+    if pid < 0:
         raise ProcessLookupError
 
     _util.check_rlimit_resource(res)
@@ -293,16 +298,20 @@ def proc_get_sigmasks(pid: int) -> ProcessSignalMasks:
 
 
 def proc_getpgid(pid: int) -> int:
-    if _cache.is_enabled(pid):
-        # We're in a oneshot_proc(); retrieve extra information
+    if pid == 0 or _cache.is_enabled(pid):
+        # Either a) pid=0, so we can't use getpgid() (because for that function
+        # pid=0 means the current process) or b) we're in a oneshot_proc() and
+        # we should retrieve extra information.
         return cast(int, _get_kinfo_proc(pid).ki_pgid)
     else:
         return _psposix.proc_getpgid(pid)
 
 
 def proc_getsid(pid: int) -> int:
-    if _cache.is_enabled(pid):
-        # We're in a oneshot_proc(); retrieve extra information
+    if pid == 0 or _cache.is_enabled(pid):
+        # Either a) pid=0, so we can't use getsid() (because for that function
+        # pid=0 means the current process) or b) we're in a oneshot_proc() and
+        # we should retrieve extra information.
         return cast(int, _get_kinfo_proc(pid).ki_sid)
     else:
         return _psposix.proc_getsid(pid)
