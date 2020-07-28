@@ -3,7 +3,7 @@
 # pytype: disable=module-attr
 import resource
 import sys
-from typing import ContextManager, List, Optional, Tuple, Union, cast
+from typing import Any, ContextManager, Dict, Iterable, List, Optional, Tuple, Union, cast
 
 import psutil
 
@@ -294,3 +294,42 @@ if sys.platform.startswith(
             raise psutil.NoSuchProcess(pid)
         except PermissionError:
             raise psutil.AccessDenied(pid)
+
+
+_PROC_DICT_FUNCS = {
+    name: locals()[func_name]
+    for (name, func_name) in [
+        ("umask", "proc_get_umask"),
+        ("groups", "proc_getgroups"),
+        ("sigmasks", "proc_get_sigmasks"),
+        ("pgid", "proc_getpgid"),
+        ("sid", "proc_getsid"),
+    ]
+    if func_name in locals()
+}
+
+
+def proc_as_dict(
+    proc: Union[int, psutil.Process], *, attrs: Optional[Iterable[str]] = None, ad_value: Any = None
+) -> Dict[str, Any]:
+    pid = _get_pid(proc)
+
+    res = {}
+
+    if attrs is None:
+        attrs = _PROC_DICT_FUNCS.keys()
+
+    with oneshot_proc(pid):
+        for name in attrs:
+            if not isinstance(name, str):
+                raise TypeError("invalid attr type {!r}".format(type(name)))
+
+            if name in _PROC_DICT_FUNCS:
+                try:
+                    res[name] = _PROC_DICT_FUNCS[name](pid)  # pytype: disable=not-callable
+                except (psutil.AccessDenied, psutil.ZombieProcess):
+                    res[name] = ad_value
+            else:
+                raise ValueError("invalid attr name {!r}".format(name))
+
+    return res
