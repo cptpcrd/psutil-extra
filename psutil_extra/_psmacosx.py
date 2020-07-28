@@ -5,9 +5,7 @@ from typing import List, Set, cast
 
 from . import _cache, _psposix, _util
 from ._bsd import sysctl_raw
-from ._ffi import gid_t, load_libc, pid_t, uid_t
-
-libc = load_libc()
+from ._ffi import gid_t, pid_t, uid_t
 
 WMESGLEN = 7
 NGROUPS = 16
