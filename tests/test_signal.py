@@ -76,7 +76,7 @@ if sys.platform.startswith(("linux", "freebsd", "openbsd", "netbsd", "darwin")):
     def blank_signal_handler(sig: int, frame: Any) -> None:  # pylint: disable=unused-argument
         pass
 
-    def check_sigmasks(
+    def check_sigmasks(  # pytype: disable=attribute-error
         sigmasks: psutil_extra._psimpl.ProcessSignalMasks,  # pylint: disable=protected-access
     ) -> None:
         if hasattr(sigmasks, "blocked"):
