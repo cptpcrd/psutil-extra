@@ -13,23 +13,23 @@ def test_as_dict() -> None:
 
     if hasattr(psutil_extra, "proc_get_umask"):
         assert info["umask"] == psutil_extra.proc_get_umask(pid)
-        assert info["umask"] == psutil_extra.proc_as_dict(pid)["umask"]
+        assert psutil_extra.proc_as_dict(pid, attrs=["umask"]) == {"umask": info["umask"]}
 
     if hasattr(psutil_extra, "proc_getgroups"):
         assert info["groups"] == psutil_extra.proc_getgroups(pid)
-        assert info["groups"] == psutil_extra.proc_as_dict(pid)["groups"]
+        assert psutil_extra.proc_as_dict(pid, attrs=["groups"]) == {"groups": info["groups"]}
 
     if hasattr(psutil_extra, "proc_get_sigmasks"):
         assert info["sigmasks"] == psutil_extra.proc_get_sigmasks(pid)
-        assert info["sigmasks"] == psutil_extra.proc_as_dict(pid)["sigmasks"]
+        assert psutil_extra.proc_as_dict(pid, attrs=["sigmasks"]) == {"sigmasks": info["sigmasks"]}
 
     if hasattr(psutil_extra, "proc_getpgid"):
         assert info["pgid"] == psutil_extra.proc_getpgid(pid)
-        assert info["pgid"] == psutil_extra.proc_as_dict(pid)["pgid"]
+        assert psutil_extra.proc_as_dict(pid, attrs=["pgid"]) == {"pgid": info["pgid"]}
 
     if hasattr(psutil_extra, "proc_getsid"):
         assert info["sid"] == psutil_extra.proc_getsid(pid)
-        assert info["sid"] == psutil_extra.proc_as_dict(pid)["sid"]
+        assert psutil_extra.proc_as_dict(pid, attrs=["sid"]) == {"sid": info["sid"]}
 
 
 def test_as_dict_error() -> None:
