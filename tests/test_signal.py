@@ -50,8 +50,14 @@ if sys.platform.startswith(("linux", "freebsd", "openbsd", "netbsd", "darwin")):
 
             # Now we send ourselves SIGUSR1, set a handler for SIGUSR2,
             # and check that everything matches again.
-            signal.pthread_kill(threading.get_ident(), signal.SIGUSR1)
+
+            # Signal handling across threads differs by platform.
+            if sys.platform.startswith("linux"):
+                signal.pthread_kill(threading.get_ident(), signal.SIGUSR1)
+            else:
+                os.kill(os.getpid(), signal.SIGUSR1)
             sent_sigusr1 = True
+
             signal.signal(signal.SIGUSR2, blank_signal_handler)
 
             sigmasks = psutil_extra.proc_get_sigmasks(os.getpid())
