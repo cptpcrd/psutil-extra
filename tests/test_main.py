@@ -170,6 +170,14 @@ if sys.platform.startswith(
         with psutil_extra.oneshot_proc(1):
             assert psutil_extra.proc_getsid(1) == 1
 
+        with psutil_extra.oneshot_proc(1):
+            assert psutil_extra.proc_getsid(1) == 1
+
+            with psutil_extra.oneshot_proc(1):
+                assert psutil_extra.proc_getsid(1) == 1
+
+            assert psutil_extra.proc_getsid(1) == 1
+
     def test_getsid_no_proc() -> None:
         with pytest.raises(psutil.NoSuchProcess):
             psutil_extra.proc_getsid(-1)
@@ -193,3 +201,8 @@ if sys.platform.startswith(
 
             with pytest.raises(psutil.NoSuchProcess):
                 psutil_extra.proc_getsid(proc)
+
+        with psutil_extra.oneshot_proc(proc.pid):
+            with psutil_extra.oneshot_proc(proc.pid):
+                with pytest.raises(psutil.NoSuchProcess):
+                    psutil_extra.proc_getsid(proc.pid)
