@@ -70,7 +70,7 @@ if sys.platform.startswith(("linux", "freebsd")):
                 psutil_extra.proc_get_umask(proc)
 
 
-if sys.platform.startswith(("linux", "freebsd", "dragonfly", "darwin", "netbsd", "solaris")):
+if sys.platform.startswith(("linux", "darwin", "freebsd", "netbsd", "dragonfly", "solaris")):
 
     def test_getgroups() -> None:
         groups = psutil_extra.proc_getgroups(os.getpid())
@@ -121,7 +121,7 @@ if sys.platform.startswith(("linux", "freebsd", "dragonfly", "darwin", "netbsd",
 
 
 if sys.platform.startswith(
-    ("linux", "freebsd", "netbsd", "openbsd", "dragonfly", "darwin", "solaris")
+    ("linux", "darwin", "freebsd", "openbsd", "netbsd", "dragonfly", "solaris")
 ):
 
     def test_getpgid() -> None:

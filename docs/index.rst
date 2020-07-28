@@ -108,7 +108,7 @@ instance or an ``int`` representing a process ID.
        A list of the given process's current supplementary groups.
    :rtype: list[int]
 
-   Availability: Linux, FreeBSD, DragonflyBSD, macOS, NetBSD, Solaris, OpenBSD
+   Availability: Linux, macOS, FreeBSD, OpenBSD, NetBSD, DragonflyBSD, Solaris
 
 
 .. py:function:: proc_rlimit(proc, resource, new_limits=None)
@@ -187,7 +187,7 @@ instance or an ``int`` representing a process ID.
    :type proc: int or psutil.Process
    :returns: A dataclass containing the fields listed above
 
-   Availability: Linux, OpenBSD, NetBSD, FreeBSD, macOS
+   Availability: Linux, macOS, FreeBSD, OpenBSD, NetBSD
 
 
 .. py:function:: proc_getpgid(proc)
@@ -204,7 +204,7 @@ instance or an ``int`` representing a process ID.
    :returns: The process group ID of the given process
    :rtype: int
 
-   Availability: Linux, FreeBSD, NetBSD, DragonflyBSD, OpenBSD, macOS
+   Availability: Linux, macOS, FreeBSD, OpenBSD, NetBSD, DragonflyBSD
 
 
 .. py:function:: proc_getsid(proc)
@@ -221,7 +221,7 @@ instance or an ``int`` representing a process ID.
    :returns: The session ID of the given process
    :rtype: int
 
-   Availability: Linux, FreeBSD, NetBSD, DragonflyBSD, OpenBSD, macOS
+   Availability: Linux, macOS, FreeBSD, OpenBSD, NetBSD, DragonflyBSD
 
 
 Error handling

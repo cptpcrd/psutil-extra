@@ -12,7 +12,7 @@ import psutil_extra
 
 from .util import fork_proc
 
-if sys.platform.startswith(("linux", "freebsd", "openbsd", "netbsd", "darwin")):
+if sys.platform.startswith(("linux", "darwin", "freebsd", "openbsd", "netbsd")):
 
     def test_sigmasks_simple() -> None:
         sigmasks = psutil_extra.proc_get_sigmasks(os.getpid())

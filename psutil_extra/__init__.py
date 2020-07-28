@@ -106,7 +106,7 @@ if sys.platform.startswith(("linux", "freebsd")):
 
 
 if sys.platform.startswith(
-    ("linux", "freebsd", "dragonfly", "darwin", "netbsd", "openbsd", "solaris")
+    ("linux", "darwin", "freebsd", "openbsd", "netbsd", "dragonfly", "solaris")
 ):
 
     def proc_getgroups(proc: Union[int, psutil.Process]) -> List[int]:
@@ -207,7 +207,7 @@ if sys.platform.startswith(("linux", "freebsd", "netbsd", "dragonfly")):
             raise psutil.AccessDenied(pid)
 
 
-if sys.platform.startswith(("linux", "freebsd", "openbsd", "netbsd", "darwin")):
+if sys.platform.startswith(("linux", "darwin", "freebsd", "openbsd", "netbsd")):
 
     def proc_get_sigmasks(  # pytype: disable=attribute-error,invalid-annotation
         proc: Union[int, psutil.Process]
@@ -243,7 +243,7 @@ if sys.platform.startswith(("linux", "freebsd", "openbsd", "netbsd", "darwin")):
 
 
 if sys.platform.startswith(
-    ("linux", "freebsd", "netbsd", "openbsd", "dragonfly", "darwin", "solaris")
+    ("linux", "darwin", "freebsd", "openbsd", "netbsd", "dragonfly", "solaris")
 ):
 
     def proc_getpgid(proc: Union[int, psutil.Process]) -> int:
