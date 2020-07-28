@@ -33,14 +33,18 @@ if sys.platform.startswith(("linux", "freebsd", "openbsd", "netbsd", "darwin")):
             check_sigmasks(sigmasks)
 
             # SIGUSR1 is blocked but not pending
-            assert signal.SIGUSR1 in sigmasks.blocked
-            assert signal.SIGUSR1 not in sigmasks.pending
+            if hasattr(sigmasks, "blocked"):
+                assert signal.SIGUSR1 in sigmasks.blocked
+            if hasattr(sigmasks, "pending"):
+                assert signal.SIGUSR1 not in sigmasks.pending
             assert signal.SIGUSR1 not in sigmasks.caught
             assert signal.SIGUSR1 not in sigmasks.ignored
 
             # SIGUSR2 is ignored
-            assert signal.SIGUSR2 not in sigmasks.blocked
-            assert signal.SIGUSR2 not in sigmasks.pending
+            if hasattr(sigmasks, "blocked"):
+                assert signal.SIGUSR2 not in sigmasks.blocked
+            if hasattr(sigmasks, "pending"):
+                assert signal.SIGUSR2 not in sigmasks.pending
             assert signal.SIGUSR2 not in sigmasks.caught
             assert signal.SIGUSR2 in sigmasks.ignored
 
@@ -54,14 +58,18 @@ if sys.platform.startswith(("linux", "freebsd", "openbsd", "netbsd", "darwin")):
             check_sigmasks(sigmasks)
 
             # SIGUSR1 is blocked and pending
-            assert signal.SIGUSR1 in sigmasks.blocked
-            assert signal.SIGUSR1 in sigmasks.pending
+            if hasattr(sigmasks, "blocked"):
+                assert signal.SIGUSR1 in sigmasks.blocked
+            if hasattr(sigmasks, "pending"):
+                assert signal.SIGUSR1 in sigmasks.pending
             assert signal.SIGUSR1 not in sigmasks.caught
             assert signal.SIGUSR1 not in sigmasks.ignored
 
             # SIGUSR2 is caught
-            assert signal.SIGUSR2 not in sigmasks.blocked
-            assert signal.SIGUSR2 not in sigmasks.pending
+            if hasattr(sigmasks, "blocked"):
+                assert signal.SIGUSR2 not in sigmasks.blocked
+            if hasattr(sigmasks, "pending"):
+                assert signal.SIGUSR2 not in sigmasks.pending
             assert signal.SIGUSR2 in sigmasks.caught
             assert signal.SIGUSR2 not in sigmasks.ignored
 
