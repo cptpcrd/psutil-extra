@@ -6,8 +6,11 @@ import threading
 from typing import Any
 
 import psutil
+import pytest
 
 import psutil_extra
+
+from .util import fork_proc
 
 if sys.platform.startswith(("linux", "freebsd", "openbsd", "netbsd", "darwin")):
 
@@ -87,6 +90,30 @@ if sys.platform.startswith(("linux", "freebsd", "openbsd", "netbsd", "darwin")):
 
             signal.pthread_sigmask(signal.SIG_SETMASK, old_mask)
             signal.signal(signal.SIGUSR2, signal.SIG_DFL)
+
+    def test_sigmasks_no_proc() -> None:
+        with pytest.raises(psutil.NoSuchProcess):
+            psutil_extra.proc_get_sigmasks(-1)
+
+        with psutil_extra.oneshot_proc(-1):
+            with pytest.raises(psutil.NoSuchProcess):
+                psutil_extra.proc_get_sigmasks(-1)
+
+        proc = fork_proc(lambda: sys.exit(0))
+        proc.wait(timeout=1)
+
+        with pytest.raises(psutil.NoSuchProcess):
+            psutil_extra.proc_get_sigmasks(proc.pid)
+
+        with pytest.raises(psutil.NoSuchProcess):
+            psutil_extra.proc_get_sigmasks(proc)
+
+        with psutil_extra.oneshot_proc(proc.pid):
+            with pytest.raises(psutil.NoSuchProcess):
+                psutil_extra.proc_get_sigmasks(proc.pid)
+
+            with pytest.raises(psutil.NoSuchProcess):
+                psutil_extra.proc_get_sigmasks(proc)
 
     def blank_signal_handler(sig: int, frame: Any) -> None:  # pylint: disable=unused-argument
         pass
