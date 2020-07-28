@@ -297,7 +297,7 @@ if sys.platform.startswith(
 
 
 _PROC_DICT_FUNCS = {
-    name: locals()[func_name]
+    name: globals()[func_name]
     for (name, func_name) in [
         ("umask", "proc_get_umask"),
         ("groups", "proc_getgroups"),
@@ -305,7 +305,7 @@ _PROC_DICT_FUNCS = {
         ("pgid", "proc_getpgid"),
         ("sid", "proc_getsid"),
     ]
-    if func_name in locals()
+    if func_name in globals()
 }
 
 
