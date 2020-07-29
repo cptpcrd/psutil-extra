@@ -47,7 +47,7 @@ class CachedByPid(Generic[T]):
 
 @contextlib.contextmanager  # type: ignore
 def oneshot_proc(pid: int) -> Iterable[None]:  # pytype: disable=wrong-arg-types
-    if pid in _cache_store.__dict__:  # type: ignore
+    if is_enabled(pid)
         yield
     else:
         _cache_store.__dict__[pid] = {}  # type: ignore
