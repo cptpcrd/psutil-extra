@@ -102,7 +102,7 @@ instance or an ``int`` representing a process ID.
 
    .. note::
        On macOS, this function's behavior differs from that of
-       `os.getgroups() <https://docs.python.org/3/library/os.html#os.getgroups>`.
+       `os.getgroups() <https://docs.python.org/3/library/os.html#os.getgroups>`_.
        Effectively, it always behaves as if the deployment target is less than 10.5.
 
    :param proc:
