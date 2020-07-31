@@ -29,7 +29,7 @@ def _proc_rlimit_getset(pid: int, res: int, new_limit: Optional[int], hard: bool
     new_limit_raw = ctypes.byref(rlim_t(new_limit)) if new_limit is not None else None
     old_limit = rlim_t(0)
 
-    _bsd.sysctl_raw(  # pytype: disable=wrong-arg-types
+    _bsd.sysctl(  # pytype: disable=wrong-arg-types
         [
             CTL_PROC,
             pid,
@@ -201,7 +201,7 @@ def _get_kinfo_proc2(pid: int) -> KinfoProc2:
 
     proc_info = KinfoProc2()
 
-    length = _bsd.sysctl_raw([CTL_KERN, KERN_PROC2, KERN_PROC_PID, pid], None, proc_info)
+    length = _bsd.sysctl([CTL_KERN, KERN_PROC2, KERN_PROC_PID, pid], None, proc_info)
 
     if length == 0:
         raise ProcessLookupError

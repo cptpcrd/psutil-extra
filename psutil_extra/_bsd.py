@@ -1,5 +1,5 @@
 import ctypes
-from typing import Collection, Optional, Union
+from typing import Collection, Union
 
 from . import _ffi
 
@@ -16,7 +16,7 @@ libc.sysctl.argtypes = (
 libc.sysctl.restype = ctypes.c_int
 
 
-def sysctl_raw(
+def sysctl(
     mib: Collection[int],
     new: Union[None, bytes, ctypes.Array, ctypes.Structure],  # type: ignore
     old: Union[None, ctypes.Array, ctypes.Structure],  # type: ignore
@@ -44,17 +44,3 @@ def sysctl_raw(
         raise _ffi.build_oserror(ctypes.get_errno())
 
     return old_size.value
-
-
-def sysctl(
-    mib: Collection[int],
-    new: Union[None, bytes, ctypes.Array, ctypes.Structure],  # type: ignore
-    old_len: Optional[int] = None,
-) -> bytes:
-    if old_len is None:
-        old_len = sysctl_raw(mib, None, None)
-
-    buf = (ctypes.c_char * old_len)()
-
-    old_len = sysctl_raw(mib, new, buf)
-    return buf.raw[:old_len]

@@ -4,7 +4,7 @@ import dataclasses
 from typing import List, Set, cast
 
 from . import _cache, _psposix, _util
-from ._bsd import sysctl_raw
+from ._bsd import sysctl
 from ._ffi import gid_t, pid_t, uid_t
 
 WMESGLEN = 7
@@ -183,7 +183,7 @@ def _get_kinfo_proc(pid: int) -> KinfoProc:
 
     proc_info = KinfoProc()
 
-    length = sysctl_raw([CTL_KERN, KERN_PROC, KERN_PROC_PID, pid], None, proc_info)
+    length = sysctl([CTL_KERN, KERN_PROC, KERN_PROC_PID, pid], None, proc_info)
 
     if length == 0:
         raise ProcessLookupError

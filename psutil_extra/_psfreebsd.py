@@ -222,7 +222,7 @@ def _get_kinfo_proc(pid: int) -> KinfoProc:
 
     proc_info = KinfoProc()
 
-    length = _bsd.sysctl_raw([CTL_KERN, KERN_PROC, KERN_PROC_PID, pid], None, proc_info)
+    length = _bsd.sysctl([CTL_KERN, KERN_PROC, KERN_PROC_PID, pid], None, proc_info)
 
     if length == 0:
         raise ProcessLookupError
@@ -241,7 +241,7 @@ def proc_get_umask(pid: int) -> int:
 
     umask = ctypes.c_ushort()
 
-    _bsd.sysctl_raw(  # pytype: disable=wrong-arg-types
+    _bsd.sysctl(  # pytype: disable=wrong-arg-types
         [CTL_KERN, KERN_PROC, KERN_PROC_UMASK, pid], None, umask  # type: ignore
     )
 
@@ -264,14 +264,14 @@ def proc_getgroups(pid: int) -> List[int]:
 
     while True:
         # Get the number of groups
-        ngroups = _bsd.sysctl_raw([CTL_KERN, KERN_PROC, KERN_PROC_GROUPS, pid], None, None)
+        ngroups = _bsd.sysctl([CTL_KERN, KERN_PROC, KERN_PROC_GROUPS, pid], None, None)
 
         # Create an array with that many elements
         groups = (gid_t * ngroups)()
 
         try:
             # Get the actual group list
-            ngroups = _bsd.sysctl_raw([CTL_KERN, KERN_PROC, KERN_PROC_GROUPS, pid], None, groups)
+            ngroups = _bsd.sysctl([CTL_KERN, KERN_PROC, KERN_PROC_GROUPS, pid], None, groups)
         except OSError as ex:
             # EINVAL means a range error; retry
             if ex.errno != errno.EINVAL:
@@ -293,7 +293,7 @@ def proc_rlimit(
 
     old_limits = Rlimit(rlim_cur=resource.RLIM_INFINITY, rlim_max=resource.RLIM_INFINITY)
 
-    _bsd.sysctl_raw([CTL_KERN, KERN_PROC, KERN_PROC_RLIMIT, pid, res], new_limits_raw, old_limits)
+    _bsd.sysctl([CTL_KERN, KERN_PROC, KERN_PROC_RLIMIT, pid, res], new_limits_raw, old_limits)
 
     return old_limits.unpack()
 
