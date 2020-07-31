@@ -209,7 +209,7 @@ instance or an ``int`` representing a process ID.
    :returns: The process group ID of the given process
    :rtype: int
 
-   Availability: Linux, macOS, FreeBSD, OpenBSD, NetBSD, DragonFlyBSD
+   Availability: Linux, macOS, FreeBSD, OpenBSD, NetBSD, DragonFlyBSD, Solaris
 
 
 .. py:function:: proc_getsid(proc)
@@ -226,7 +226,7 @@ instance or an ``int`` representing a process ID.
    :returns: The session ID of the given process
    :rtype: int
 
-   Availability: Linux, macOS, FreeBSD, OpenBSD, NetBSD, DragonFlyBSD
+   Availability: Linux, macOS, FreeBSD, OpenBSD, NetBSD, DragonFlyBSD, Solaris
 
 
 Error handling
