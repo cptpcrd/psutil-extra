@@ -3,7 +3,6 @@ import ctypes
 import errno
 import os
 import resource
-import struct
 import sys
 from typing import List, Optional, Tuple, cast
 
@@ -32,8 +31,9 @@ KI_NGROUPS = 16
 LOGNAMELEN = 17
 LOGINCLASSLEN = 17
 
+KI_CRF_GRP_OVERFLOW = 0x80000000
+
 gid_t = ctypes.c_uint32  # pylint: disable=invalid-name
-gid_t_format = "=I"
 rlim_t = ctypes.c_int64  # pylint: disable=invalid-name
 
 if sys.maxsize > 2 ** 32 or os.uname().machine.startswith("riscv"):
@@ -250,20 +250,35 @@ def proc_get_umask(pid: int) -> int:
 
 def proc_getgroups(pid: int) -> List[int]:
     if _cache.is_enabled(pid):
-        # We're in a oneshot_proc(); retrieve extra information
-        return _get_kinfo_proc(pid).get_groups()
+        # We're in a oneshot_proc(); try to retrieve extra information
+        kinfo = _get_kinfo_proc(pid)
+
+        if not kinfo.ki_cr_flags & KI_CRF_GRP_OVERFLOW:
+            return kinfo.get_groups()
+
+        # KI_CRF_GRP_OVERFLOW was in ki_cr_flags. The group list was truncated,
+        # and we'll have to fall back on the KERN_PROC_GROUPS sysctl.
 
     if pid < 0:
         raise ProcessLookupError
 
     while True:
+        # Get the number of groups
+        ngroups = _bsd.sysctl_raw([CTL_KERN, KERN_PROC, KERN_PROC_GROUPS, pid], None, None)
+
+        # Create an array with that many elements
+        groups = (gid_t * ngroups)()
+
         try:
-            groups_bin = _bsd.sysctl([CTL_KERN, KERN_PROC, KERN_PROC_GROUPS, pid], None)
+            # Get the actual group list
+            ngroups = _bsd.sysctl_raw([CTL_KERN, KERN_PROC, KERN_PROC_GROUPS, pid], None, groups)
         except OSError as ex:
+            # EINVAL means a range error; retry
             if ex.errno != errno.EINVAL:
                 raise
         else:
-            return [gid for (gid,) in struct.iter_unpack(gid_t_format, groups_bin)]
+            # Return the group list
+            return groups[:ngroups]
 
 
 def proc_rlimit(
