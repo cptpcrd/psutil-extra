@@ -1,3 +1,6 @@
+import errno
+from typing import Optional
+
 import psutil
 import pytest
 
@@ -12,7 +15,17 @@ def test_as_dict() -> None:
     assert info == psutil_extra.proc_as_dict(proc)
 
     if hasattr(psutil_extra, "proc_get_umask"):
-        assert info["umask"] == psutil_extra.proc_get_umask(pid)
+        umask: Optional[int]
+
+        try:
+            umask = psutil_extra.proc_get_umask(pid)
+        except OSError as ex:
+            if ex.errno == errno.ENOTSUP:
+                umask = None
+            else:
+                raise
+
+        assert info["umask"] == umask
         assert psutil_extra.proc_as_dict(pid, attrs=["umask"]) == {"umask": info["umask"]}
 
     if hasattr(psutil_extra, "proc_getgroups"):

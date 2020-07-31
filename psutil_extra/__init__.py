@@ -1,6 +1,7 @@
 # Type checkers don't like the wrapper names not existing.
 # mypy: ignore-errors
 # pytype: disable=module-attr
+import errno
 import resource
 import sys
 from typing import Any, ContextManager, Dict, Iterable, List, Optional, Tuple, Union, cast
@@ -329,6 +330,11 @@ def proc_as_dict(
                     res[name] = _PROC_DICT_FUNCS[name](pid)  # pytype: disable=not-callable
                 except (psutil.AccessDenied, psutil.ZombieProcess):
                     res[name] = ad_value
+                except OSError as ex:
+                    if ex.errno == errno.ENOTSUP:
+                        res[name] = ad_value
+                    else:
+                        raise
             else:
                 raise ValueError("invalid attr name {!r}".format(name))
 
