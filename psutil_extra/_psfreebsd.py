@@ -264,20 +264,22 @@ def proc_getgroups(pid: int) -> List[int]:
 
     while True:
         # Get the number of groups
-        ngroups = _bsd.sysctl([CTL_KERN, KERN_PROC, KERN_PROC_GROUPS, pid], None, None)
+        groupsize = _bsd.sysctl([CTL_KERN, KERN_PROC, KERN_PROC_GROUPS, pid], None, None)
+        ngroups = groupsize // ctypes.sizeof(gid_t)
 
         # Create an array with that many elements
         groups = (gid_t * ngroups)()
 
         try:
             # Get the actual group list
-            ngroups = _bsd.sysctl([CTL_KERN, KERN_PROC, KERN_PROC_GROUPS, pid], None, groups)
+            groupsize = _bsd.sysctl([CTL_KERN, KERN_PROC, KERN_PROC_GROUPS, pid], None, groups)
         except OSError as ex:
             # EINVAL means a range error; retry
             if ex.errno != errno.EINVAL:
                 raise
         else:
             # Return the group list
+            ngroups = groupsize // ctypes.sizeof(gid_t)
             return groups[:ngroups]
 
 
