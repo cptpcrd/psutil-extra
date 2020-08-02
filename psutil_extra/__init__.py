@@ -10,7 +10,7 @@ import psutil
 
 from . import _cache
 
-__version__ = "0.1.0"
+__version__ = "0.2.0"
 
 if sys.platform.startswith("linux"):
     from . import _pslinux
