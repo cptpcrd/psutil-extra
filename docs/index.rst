@@ -97,7 +97,7 @@ instance or an ``int`` representing a process ID.
    Returns a list of the given process's supplementary groups.
 
    .. note::
-       Currently, on Windows Subsystem for Linux 1 (not tested on WSL 2), this
+       Currently, on Windows Subsystem for Linux 1 (not on WSL 2), this
        function succeeds but always returns an empty list.
 
    .. note::
@@ -183,7 +183,7 @@ instance or an ``int`` representing a process ID.
      just the specified thread.
 
    .. note::
-       Currently, on Windows Subsystem for Linux 1 (not tested on WSL 2), this
+       Currently, on Windows Subsystem for Linux 1 (not on WSL 2), this
        function succeeds but always returns empty sets for all fields.
 
    :param proc:
