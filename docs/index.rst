@@ -28,7 +28,7 @@ instance or an ``int`` representing a process ID.
           will be used regardless of whether a ``psutil.Process`` or an integer PID is passed to the
           underlying function. For example:
 
-          .. code-block::
+          .. code-block:: python3
 
                with oneshot_proc(1):
                    proc_getgroups(1)  # Retrieves the process information
