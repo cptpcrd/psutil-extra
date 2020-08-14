@@ -132,10 +132,10 @@ if sys.platform.startswith(
         with psutil_extra.oneshot_proc(os.getpid()):
             assert psutil_extra.proc_getpgid(os.getpid()) == os.getpgrp()
 
-        assert psutil_extra.proc_getpgid(1) == 1
+        assert psutil_extra.proc_getpgid(1) <= 1
 
         with psutil_extra.oneshot_proc(1):
-            assert psutil_extra.proc_getpgid(1) == 1
+            assert psutil_extra.proc_getpgid(1) <= 1
 
     def test_getpgid_no_proc() -> None:
         with pytest.raises(psutil.NoSuchProcess):
@@ -167,18 +167,18 @@ if sys.platform.startswith(
         with psutil_extra.oneshot_proc(os.getpid()):
             assert psutil_extra.proc_getsid(os.getpid()) == os.getsid(os.getpid())
 
-        assert psutil_extra.proc_getsid(1) == 1
+        assert psutil_extra.proc_getsid(1) <= 1
 
         with psutil_extra.oneshot_proc(1):
-            assert psutil_extra.proc_getsid(1) == 1
+            assert psutil_extra.proc_getsid(1) <= 1
 
         with psutil_extra.oneshot_proc(1):
-            assert psutil_extra.proc_getsid(1) == 1
+            assert psutil_extra.proc_getsid(1) <= 1
 
             with psutil_extra.oneshot_proc(1):
-                assert psutil_extra.proc_getsid(1) == 1
+                assert psutil_extra.proc_getsid(1) <= 1
 
-            assert psutil_extra.proc_getsid(1) == 1
+            assert psutil_extra.proc_getsid(1) <= 1
 
     def test_getsid_no_proc() -> None:
         with pytest.raises(psutil.NoSuchProcess):
