@@ -268,7 +268,7 @@ def proc_getgroups(pid: int) -> List[int]:
         ngroups = groupsize // ctypes.sizeof(gid_t)
 
         # Create an array with that many elements
-        groups = (gid_t * ngroups)()
+        groups = (gid_t * ngroups)()  # pytype: disable=not-callable
 
         try:
             # Get the actual group list
