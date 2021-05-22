@@ -29,8 +29,8 @@ def _get_proc_status_fields(pid: int) -> List[str]:
     try:
         with open(os.path.join(_util.get_procfs_path(), str(pid), "status")) as file:
             return file.read().rstrip("\n").split(" ")
-    except FileNotFoundError:
-        raise ProcessLookupError
+    except FileNotFoundError as ex:
+        raise ProcessLookupError from ex
 
 
 @_cache.CachedByPid
@@ -58,8 +58,8 @@ def _get_proc_rlimits(pid: int) -> Dict[int, Tuple[int, int]]:
                 limits[res] = (lim_cur, lim_max)
 
         return limits
-    except FileNotFoundError:
-        raise ProcessLookupError
+    except FileNotFoundError as ex:
+        raise ProcessLookupError from ex
 
 
 def proc_getgroups(pid: int) -> List[int]:
@@ -71,8 +71,8 @@ def proc_getrlimit(pid: int, res: int) -> Tuple[int, int]:
 
     try:
         return limits[res]
-    except KeyError:
-        raise ValueError("invalid resource specified")
+    except KeyError as ex:
+        raise ValueError("invalid resource specified") from ex
 
 
 def proc_getpgid(pid: int) -> int:

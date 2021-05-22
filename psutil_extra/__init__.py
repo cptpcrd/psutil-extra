@@ -100,10 +100,10 @@ if sys.platform.startswith(("linux", "freebsd")):
 
         try:
             return _psimpl.proc_get_umask(pid)
-        except ProcessLookupError:
-            raise psutil.NoSuchProcess(pid)
-        except PermissionError:
-            raise psutil.AccessDenied(pid)
+        except ProcessLookupError as ex:
+            raise psutil.NoSuchProcess(pid) from ex
+        except PermissionError as ex:
+            raise psutil.AccessDenied(pid) from ex
 
 
 if sys.platform.startswith(
@@ -126,10 +126,10 @@ if sys.platform.startswith(
 
         try:
             return _psimpl.proc_getgroups(pid)
-        except ProcessLookupError:
-            raise psutil.NoSuchProcess(pid)
-        except PermissionError:
-            raise psutil.AccessDenied(pid)
+        except ProcessLookupError as ex:
+            raise psutil.NoSuchProcess(pid) from ex
+        except PermissionError as ex:
+            raise psutil.AccessDenied(pid) from ex
 
 
 if sys.platform.startswith(("linux", "freebsd", "netbsd")):
@@ -175,10 +175,10 @@ if sys.platform.startswith(("linux", "freebsd", "netbsd")):
 
         try:
             return _psimpl.proc_rlimit(pid, res, new_limits)
-        except ProcessLookupError:
-            raise psutil.NoSuchProcess(pid)
-        except PermissionError:
-            raise psutil.AccessDenied(pid)
+        except ProcessLookupError as ex:
+            raise psutil.NoSuchProcess(pid) from ex
+        except PermissionError as ex:
+            raise psutil.AccessDenied(pid) from ex
 
 
 if sys.platform.startswith(("linux", "freebsd", "netbsd", "dragonfly")):
@@ -202,10 +202,10 @@ if sys.platform.startswith(("linux", "freebsd", "netbsd", "dragonfly")):
 
         try:
             return _psimpl.proc_getrlimit(pid, res)
-        except ProcessLookupError:
-            raise psutil.NoSuchProcess(pid)
-        except PermissionError:
-            raise psutil.AccessDenied(pid)
+        except ProcessLookupError as ex:
+            raise psutil.NoSuchProcess(pid) from ex
+        except PermissionError as ex:
+            raise psutil.AccessDenied(pid) from ex
 
 
 if sys.platform.startswith(("linux", "darwin", "freebsd", "openbsd", "netbsd")):
@@ -238,10 +238,10 @@ if sys.platform.startswith(("linux", "darwin", "freebsd", "openbsd", "netbsd")):
 
         try:
             return _psimpl.proc_get_sigmasks(pid)
-        except ProcessLookupError:
-            raise psutil.NoSuchProcess(pid)
-        except PermissionError:
-            raise psutil.AccessDenied(pid)
+        except ProcessLookupError as ex:
+            raise psutil.NoSuchProcess(pid) from ex
+        except PermissionError as ex:
+            raise psutil.AccessDenied(pid) from ex
 
 
 if sys.platform.startswith(
@@ -267,10 +267,10 @@ if sys.platform.startswith(
 
         try:
             return _psimpl.proc_getpgid(pid)
-        except ProcessLookupError:
-            raise psutil.NoSuchProcess(pid)
-        except PermissionError:
-            raise psutil.AccessDenied(pid)
+        except ProcessLookupError as ex:
+            raise psutil.NoSuchProcess(pid) from ex
+        except PermissionError as ex:
+            raise psutil.AccessDenied(pid) from ex
 
     def proc_getsid(proc: Union[int, psutil.Process]) -> int:
         """Get the sessopm ID of the given process.
@@ -291,10 +291,10 @@ if sys.platform.startswith(
 
         try:
             return _psimpl.proc_getsid(pid)
-        except ProcessLookupError:
-            raise psutil.NoSuchProcess(pid)
-        except PermissionError:
-            raise psutil.AccessDenied(pid)
+        except ProcessLookupError as ex:
+            raise psutil.NoSuchProcess(pid) from ex
+        except PermissionError as ex:
+            raise psutil.AccessDenied(pid) from ex
 
 
 _PROC_DICT_FUNCS = {

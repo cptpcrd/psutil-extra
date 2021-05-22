@@ -27,8 +27,8 @@ def _get_proc_status_dict(pid: int) -> Dict[str, str]:
                 res[name] = value.rstrip("\n")
 
         return res
-    except FileNotFoundError:
-        raise ProcessLookupError
+    except FileNotFoundError as ex:
+        raise ProcessLookupError from ex
 
 
 def proc_getgroups(pid: int) -> List[int]:
@@ -38,8 +38,8 @@ def proc_getgroups(pid: int) -> List[int]:
 def proc_get_umask(pid: int) -> int:
     try:
         umask_str = _get_proc_status_dict(pid)["Umask"]
-    except KeyError:
-        raise _ffi.build_oserror(errno.ENOTSUP)
+    except KeyError as ex:
+        raise _ffi.build_oserror(errno.ENOTSUP) from ex
     else:
         return int(umask_str, 8)
 
