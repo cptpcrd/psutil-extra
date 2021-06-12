@@ -9,4 +9,4 @@ for cmd in black autopep8 isort; do
 done
 
 # Order is important. There are a few things that black and autopep8 disagree on.
-black psutil_extra tests && autopep8 --in-place --recursive psutil_extra tests && isort --recursive psutil_extra tests
+black psutil_extra tests && autopep8 --in-place --recursive psutil_extra tests && isort psutil_extra tests

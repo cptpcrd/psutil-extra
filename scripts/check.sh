@@ -8,4 +8,4 @@ for cmd in flake8 isort mypy pylint; do
     fi
 done
 
-flake8 psutil_extra tests && isort --recursive --check psutil_extra tests && mypy --strict -p psutil_extra -p tests && pylint psutil_extra tests
+flake8 psutil_extra tests && isort --check psutil_extra tests && mypy --strict -p psutil_extra -p tests && pylint psutil_extra tests
